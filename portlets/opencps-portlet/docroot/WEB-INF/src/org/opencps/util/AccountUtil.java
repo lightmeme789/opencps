@@ -27,11 +27,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.opencps.accountmgt.NoSuchBusinessException;
+import org.opencps.accountmgt.NoSuchCitizenException;
 import org.opencps.accountmgt.model.Business;
 import org.opencps.accountmgt.model.Citizen;
 import org.opencps.accountmgt.service.BusinessLocalServiceUtil;
 import org.opencps.accountmgt.service.CitizenLocalServiceUtil;
 import org.opencps.dossiermgt.bean.AccountBean;
+import org.opencps.usermgt.NoSuchEmployeeException;
+import org.opencps.usermgt.NoSuchWorkingUnitException;
 import org.opencps.usermgt.model.Employee;
 import org.opencps.usermgt.model.WorkingUnit;
 import org.opencps.usermgt.service.EmployeeLocalServiceUtil;
@@ -208,8 +212,8 @@ public class AccountUtil {
 
 				}
 				else {
-					_log.info(AccountUtil.class.getName() +
-						": ########################################: AccountBean is null");
+					_log.info(
+						"########################################: AccountBean is null");
 				}
 
 			}
@@ -224,8 +228,8 @@ public class AccountUtil {
 
 				session.setAttribute(org.opencps.util.WebKeys.ACCOUNT_BEAN, accountBean);
 
-				_log.info(AccountUtil.class.getName() +
-					": ########################################: AccountType=" +
+				_log.info(
+					"########################################: AccountType=" +
 					accountBean.getAccountType() + " OwnerUserId=" + accountBean.getOwnerUserId() +
 					" OwnerOrganizationId=" + accountBean.getOwnerOrganizationId());
 			}
@@ -379,36 +383,66 @@ public class AccountUtil {
 			}
 
 			if (accountType.equals(PortletPropsValues.USERMGT_USERGROUP_NAME_CITIZEN)) {
-				Citizen citizen = CitizenLocalServiceUtil.getCitizen(user.getUserId());
+				
+				Citizen citizen = null;
 
-				accountInstance = citizen;
+				try {
+					citizen = CitizenLocalServiceUtil.getCitizen(user
+							.getUserId());
+				} catch (NoSuchCitizenException e) {
 
-				ownerUserId = citizen.getMappingUserId();
+				}
+
+				if (Validator.isNotNull(citizen)) {
+					accountInstance = citizen;
+
+					ownerUserId = citizen.getMappingUserId();
+				}
 
 			}
 			else if (accountType.equals(PortletPropsValues.USERMGT_USERGROUP_NAME_BUSINESS)) {
 
-				Business business = BusinessLocalServiceUtil.getBusiness(user.getUserId());
+				Business business = null;
 
-				ownerOrganizationId = business.getMappingOrganizationId();
+				try {
 
-				accountInstance = business;
+					business = BusinessLocalServiceUtil.getBusiness(user
+							.getUserId());
+				} catch (NoSuchBusinessException e) {
+
+				}
+
+				if (Validator.isNotNull(business)) {
+
+					ownerOrganizationId = business.getMappingOrganizationId();
+
+					accountInstance = business;
+				}
 
 			}
 			else if (accountType.equals(PortletPropsValues.USERMGT_USERGROUP_NAME_EMPLOYEE)) {
-				Employee employee =
-					EmployeeLocalServiceUtil.getEmployeeByMappingUserId(groupId, userId);
-
-				accountInstance = employee;
-
+				
+				Employee employee = null;
+				
 				try {
-					WorkingUnit workingUnit =
-						WorkingUnitLocalServiceUtil.getWorkingUnit(employee.getWorkingUnitId());
+					employee = EmployeeLocalServiceUtil
+							.getEmployeeByMappingUserId(groupId, userId);
+				} catch (NoSuchEmployeeException e) {
 
-					ownerOrganizationId = workingUnit.getMappingOrganisationId();
 				}
-				catch (Exception e) {
-					_log.warn(e.getCause());
+				
+				if (Validator.isNotNull(employee)) {
+					accountInstance = employee;
+
+					try {
+						WorkingUnit workingUnit = WorkingUnitLocalServiceUtil
+								.getWorkingUnit(employee.getWorkingUnitId());
+
+						ownerOrganizationId = workingUnit
+								.getMappingOrganisationId();
+					} catch (NoSuchWorkingUnitException e) {
+						_log.warn(e);
+					}
 				}
 
 			}

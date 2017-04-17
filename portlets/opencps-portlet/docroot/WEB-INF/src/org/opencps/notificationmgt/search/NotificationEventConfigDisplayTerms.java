@@ -54,6 +54,8 @@ public class NotificationEventConfigDisplayTerms extends DisplayTerms {
 	public static final String PLID = "plId";
 	
 	public static final String JSP_REDIRECT = "jspRedirect";
+	
+	public static final String USER_EXCEPT_LIST = "userExceptListValues";
 
 	public NotificationEventConfigDisplayTerms(PortletRequest portletRequest) {
 		super(portletRequest);

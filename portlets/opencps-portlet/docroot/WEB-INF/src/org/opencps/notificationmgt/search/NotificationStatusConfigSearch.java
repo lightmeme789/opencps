@@ -41,7 +41,7 @@ public class NotificationStatusConfigSearch extends SearchContainer<DictItem> {
 		headerNames.add("status");
 		headerNames.add("create-date");
 		headerNames.add("modified-date");
-		headerNames.add("inuse");
+		headerNames.add("action");
 
 	}
 
@@ -55,9 +55,6 @@ public class NotificationStatusConfigSearch extends SearchContainer<DictItem> {
 				new NotificationStatusConfigSearchTerms(portletRequest),
 				DEFAULT_CUR_PARAM, delta, iteratorURL, headerNames,
 				EMPTY_RESULTS_MESSAGE);
-
-		// PortletConfig portletConfig = (PortletConfig)
-		// portletRequest.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
 
 		NotificationStatusConfigDisplayTerms displayTerms = (NotificationStatusConfigDisplayTerms) getDisplayTerms();
 
@@ -78,8 +75,8 @@ public class NotificationStatusConfigSearch extends SearchContainer<DictItem> {
 				NotificationStatusConfigDisplayTerms.DOSSIER_NEXT_STATUS,
 				String.valueOf(displayTerms.getDossierNextStatus()));
 		iteratorURL.setParameter(
-				NotificationStatusConfigDisplayTerms.IS_SEND_NOTIFICATION,
-				String.valueOf(displayTerms.isSendNotification));
+				NotificationStatusConfigDisplayTerms.ACTIVE,
+				String.valueOf(displayTerms.active));
 
 	}
 

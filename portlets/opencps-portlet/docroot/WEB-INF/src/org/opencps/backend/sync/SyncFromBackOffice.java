@@ -90,10 +90,6 @@ public class SyncFromBackOffice implements MessageListener {
 			boolean statusUpdate = false;
 
 			try {
-				_log.info("Estimate date________________________________________:" + toBackOffice.getEstimateDatetime());
-				_log.info("Submit date________________________________________:" + toBackOffice.getSubmitDateTime());
-				_log.info("Fisnished date________________________________________:" + toBackOffice.getFinishDatetime());
-				_log.info("Receive dateXXXXXXXXXXXXXXXXXXXXXXXX_________________:" + toBackOffice.getReceiveDatetime());
 				
 				statusUpdate =
 					DossierLocalServiceUtil.updateDossierStatus(
@@ -220,7 +216,7 @@ public class SyncFromBackOffice implements MessageListener {
 				
 				msgNoti.put(MessageBusKeys.Message.NOTIFICATIONS, lsNotification);
 				
-				MessageBusUtil.sendMessage(MessageBusKeys.Destination.NOTIFICATIONS, msgNoti);
+				MessageBusUtil.sendMessage(MessageBusKeys.Destination.NotificationsListener, msgNoti);
 				
 			}
 			catch (Exception e) {

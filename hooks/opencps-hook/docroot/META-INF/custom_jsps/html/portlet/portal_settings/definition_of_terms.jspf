@@ -140,4 +140,28 @@
 	<dd>
 		<liferay-ui:message key="the-url-approve-register" />
 	</dd>
+	<dt>
+		[$TO_USER_FULLNAME$]
+	</dt>
+	<dd>
+		<liferay-ui:message key="to-user-fullname" />
+	</dd>
+	<dt>
+		[$DOSSIER_ID$]
+	</dt>
+	<dd>
+		<liferay-ui:message key="dossier-id" />
+	</dd>
+	<dt>
+		[$RECEPTION_NO$]
+	</dt>
+	<dd>
+		<liferay-ui:message key="so-ho-so" />
+	</dd>
+	<dt>
+		[$TO_CONTENT_NOTICE$]
+	</dt>
+	<dd>
+		<liferay-ui:message key="to-content-notice" />
+	</dd>
 </dl>

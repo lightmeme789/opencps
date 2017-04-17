@@ -1,14 +1,3 @@
-<%@page import="org.opencps.datamgt.model.DictItem"%>
-<%@page import="org.opencps.datamgt.service.DictCollectionLocalServiceUtil"%>
-<%@page import="org.opencps.datamgt.model.impl.DictCollectionImpl"%>
-<%@page import="org.opencps.datamgt.model.DictCollection"%>
-<%@page import="org.opencps.notificationmgt.service.NotificationStatusConfigLocalServiceUtil"%>
-<%@page import="org.opencps.notificationmgt.model.impl.NotificationStatusConfigImpl"%>
-<%@page import="org.opencps.notificationmgt.model.NotificationStatusConfig"%>
-<%@page import="org.opencps.notificationmgt.search.NotificationStatusConfigDisplayTerms"%>
-<%@page import="net.sf.jasperreports.util.NoWriteFieldHandler"%>
-<%@page import="org.opencps.util.PortletUtil"%>
-<%@page import="java.util.Date"%>
 <%
 	/**
 	 * OpenCPS is the open source Core Public Services software
@@ -27,29 +16,20 @@
 	 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 	 */
 %>
-<%@page import="org.opencps.util.MessageKeys"%>
-<%@page import="org.opencps.util.WebKeys"%>
-<%@page import="com.liferay.portal.kernel.log.LogFactoryUtil"%>
-<%@page import="com.liferay.portal.kernel.log.Log"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="java.util.List"%>
-<%@page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
-<%@page import="javax.portlet.PortletRequest"%>
-<%@page import="com.liferay.portlet.PortletURLFactoryUtil"%>
 <%@ include file="../../init.jsp"%>
 
 <portlet:actionURL var="updateNofificationStatusConfigURL" name="updateNotificationStatusConfig" />
 
 <%
-	long notificationConfigId = ParamUtil.getLong(request,NotificationStatusConfigDisplayTerms.NOTICE_CONFIG_ID,0);
-	String backURL = ParamUtil.getString(request, WebKeys.BACK_URL,StringPool.BLANK);
+	String dossierNextStatus = ParamUtil.getString(request,NotificationStatusConfigDisplayTerms.DOSSIER_NEXT_STATUS,StringPool.BLANK);
 
 	NotificationStatusConfig notificationConfig = new NotificationStatusConfigImpl();
 
-	if (notificationConfigId > 0) {
+	if (dossierNextStatus.trim().length() > 0) {
 
 		try {
-			notificationConfig = NotificationStatusConfigLocalServiceUtil.getNotificationStatusConfig(notificationConfigId);
+			notificationConfig = NotificationStatusConfigLocalServiceUtil
+					.getByDossierNextStatus(dossierNextStatus);
 		} catch (Exception e) {
 			_log.error(e);
 		}
@@ -83,12 +63,7 @@
 
 			<aui:model-context bean="<%=notificationConfig%>"
 				model="<%=NotificationStatusConfig.class%>" />
-			<aui:input name="<%=NotificationStatusConfigDisplayTerms.NOTICE_CONFIG_ID%>"
-				type="hidden" />
-			<aui:input name="<%=WebKeys.BACK_URL%>" type="hidden"
-				value="<%=backURL%>" />
-			<aui:input name="<%=WebKeys.CURRENT_URL%>" type="hidden"
-				value="<%=currentURL%>" />
+				
 			<aui:fieldset>
 
 				<aui:select name="<%=NotificationStatusConfigDisplayTerms.DOSSIER_NEXT_STATUS%>"
@@ -102,10 +77,10 @@
 					<%} %>
 				</aui:select>
 				
-				<aui:input name="<%=NotificationStatusConfigDisplayTerms.IS_SEND_NOTIFICATION%>" 
+				<aui:input name="<%=NotificationStatusConfigDisplayTerms.ACTIVE%>" 
 							type="checkbox" 
 							label="inuse" 
-							value="<%=Validator.isNotNull(notificationConfig) ?notificationConfig.getIsSendNotification():false %>"></aui:input>
+							value="<%=Validator.isNotNull(notificationConfig) ?notificationConfig.getActive():false %>"></aui:input>
 				
 			</aui:fieldset>
 

@@ -25,6 +25,6 @@ public class MessageBusKeys {
 	}
 	
 	public class Destination{
-		public static final String NOTIFICATIONS = "opencps/notifications";
+		public static final String NotificationsListener = "opencps/notifications";
 	}
 }

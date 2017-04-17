@@ -20,7 +20,7 @@ package org.opencps.notificationmgt.engine;
 import javax.portlet.WindowState;
 
 import org.opencps.dossiermgt.search.DossierDisplayTerms;
-import org.opencps.notificationmgt.utils.NotificationEventKeys;
+import org.opencps.notificationmgt.utils.PortletKeys;
 import org.opencps.paymentmgt.search.PaymentFileDisplayTerms;
 import org.opencps.processmgt.search.ProcessOrderDisplayTerms;
 import org.opencps.util.WebKeys;
@@ -32,14 +32,12 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.notifications.BaseUserNotificationHandler;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
-import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.UserNotificationEvent;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 
 /**
@@ -47,7 +45,8 @@ import com.liferay.portal.service.ServiceContext;
  */
 public class UserNotificationHandler extends BaseUserNotificationHandler {
 
-	private static Log _log = LogFactoryUtil.getLog(UserNotificationHandler.class);
+	private static Log _log = LogFactoryUtil
+			.getLog(UserNotificationHandler.class);
 
 	public static final String PORTLET_ID = "2_WAR_notificationsportlet";
 
@@ -58,27 +57,23 @@ public class UserNotificationHandler extends BaseUserNotificationHandler {
 	}
 
 	@Override
-	protected String getBody(
-		UserNotificationEvent userNotificationEvent, ServiceContext serviceContext)
-		throws Exception {
+	protected String getBody(UserNotificationEvent userNotificationEvent,
+			ServiceContext serviceContext) throws Exception {
 
-		JSONObject jsonObject =
-			JSONFactoryUtil.createJSONObject(userNotificationEvent.getPayload());
+		JSONObject jsonObject = JSONFactoryUtil
+				.createJSONObject(userNotificationEvent.getPayload());
 
 		String title = jsonObject.getString("title");
 		String bodyText = jsonObject.getString("notificationText");
 
 		String body = StringUtil.replace(getBodyTemplate(), new String[] {
-			"[$TITLE$]", "[$BODY_TEXT$]"
-		}, new String[] {
-			title, bodyText
-		});
+				"[$TITLE$]", "[$BODY_TEXT$]" },
+				new String[] { title, bodyText });
 
 		return body;
 	}
 
-	protected String getBodyTemplate()
-		throws Exception {
+	protected String getBodyTemplate() throws Exception {
 
 		StringBundler sb = new StringBundler(5);
 		sb.append("<div class=\"title\">[$TITLE$]</div> ");
@@ -87,124 +82,75 @@ public class UserNotificationHandler extends BaseUserNotificationHandler {
 	}
 
 	@Override
-	protected String getLink(
-		UserNotificationEvent userNotificationEvent, ServiceContext serviceContext)
-		throws Exception {
+	protected String getLink(UserNotificationEvent userNotificationEvent,
+			ServiceContext serviceContext) throws Exception {
 
-		String group = StringPool.BLANK;
-		String processOrderId = StringPool.BLANK;
-		String dossierId = StringPool.BLANK;
-		String paymentFileId = StringPool.BLANK;
+		String pattern = StringPool.BLANK;
+		long processOrderId = 0;
+		long dossierId = 0;
+		long paymentFileId = 0;
 
-		LiferayPortletResponse liferayPortletResponse = serviceContext.getLiferayPortletResponse();
+		LiferayPortletResponse liferayPortletResponse = serviceContext
+				.getLiferayPortletResponse();
 
-		JSONObject jsonObject =
-			JSONFactoryUtil.createJSONObject(userNotificationEvent.getPayload());
+		JSONObject jsonObject = JSONFactoryUtil
+				.createJSONObject(userNotificationEvent.getPayload());
 
-		group = jsonObject.getString("friendlyUrl");
+		dossierId = jsonObject.getLong("dossierId");
+		paymentFileId = jsonObject.getLong("paymentFileId");
+		processOrderId = jsonObject.getLong("processOrderId");
+		pattern = jsonObject.getString("patternConfig");
 
-		dossierId = jsonObject.getString("dossierId");
-		paymentFileId = jsonObject.getString("paymentFileId");
-		processOrderId = jsonObject.getString("processOrderId");
-
-		long plId =
-			jsonObject.getString("plId").trim().length() > 0
-				? Long.parseLong(jsonObject.getString("plId")) : 0;
-		long groupId =
-			jsonObject.getString("groupId").trim().length() > 0
-				? Long.parseLong(jsonObject.getString("plId")) : 0;;
+		long plId = jsonObject.getString("plId").trim().length() > 0 ? Long
+				.parseLong(jsonObject.getString("plId")) : 0;
 
 		LiferayPortletURL viewURL = null;
 		Layout layOut = null;
 
-		if (group.equals(NotificationEventKeys.GROUP1)) {
-			
-			if (plId <= 0) {
+		if (pattern.toUpperCase().contains(PortletKeys.EMPLOYEE) && paymentFileId <= 0
+				&& processOrderId > 0) {
 
-				layOut = LayoutLocalServiceUtil.getFriendlyURLLayout(groupId, true, group);
+			viewURL = liferayPortletResponse
+					.createRenderURL(WebKeys.PROCESS_ORDER_PORTLET);
 
-				if (Validator.isNotNull(layOut)) {
-					plId = layOut.getPlid();
-				}
-			}
-
-			viewURL = liferayPortletResponse.createRenderURL(WebKeys.PROCESS_ORDER_PORTLET);
-
-			viewURL.setParameter(
-				"mvcPath", "/html/portlets/processmgt/processorder/process_order_detail.jsp");
-			viewURL.setParameter(ProcessOrderDisplayTerms.PROCESS_ORDER_ID, processOrderId);
-			viewURL.setParameter(WebKeys.BACK_URL, "/group/guest" + group);
-			viewURL.setParameter("isEditDossier", String.valueOf(true));
+			viewURL.setParameter("mvcPath", "/html/portlets/processmgt/processorder/process_order_detail.jsp");
+			viewURL.setParameter(ProcessOrderDisplayTerms.PROCESS_ORDER_ID,
+					String.valueOf(processOrderId));
 			viewURL.setPlid(plId);
 			viewURL.setWindowState(WindowState.NORMAL);
 
-		}
-		else if (group.equals(NotificationEventKeys.GROUP2)) {
+		} else if (pattern.toUpperCase().contains(PortletKeys.CITIZEN) && paymentFileId <= 0
+				&& dossierId > 0) {
 
-			if (plId <= 0) {
+			viewURL = liferayPortletResponse
+					.createRenderURL(WebKeys.DOSSIER_MGT_PORTLET);
 
-				layOut = LayoutLocalServiceUtil.getFriendlyURLLayout(groupId, true, group);
-
-				if (Validator.isNotNull(layOut)) {
-					plId = layOut.getPlid();
-				}
-
-			}
-
-			viewURL = liferayPortletResponse.createRenderURL(WebKeys.DOSSIER_MGT_PORTLET);
-
-			viewURL.setParameter(
-				"mvcPath", "/html/portlets/dossiermgt/frontoffice/edit_dossier.jsp");
-			viewURL.setParameter(DossierDisplayTerms.DOSSIER_ID, dossierId);
-			viewURL.setParameter(Constants.CMD, Constants.VIEW);
-			viewURL.setParameter(WebKeys.BACK_URL, "/group/guest/");
-			viewURL.setParameter(WebKeys.REDIRECT_URL, "/group/guest/");
+			viewURL.setParameter("mvcPath", "/html/portlets/dossiermgt/frontoffice/edit_dossier.jsp");
+			viewURL.setParameter(DossierDisplayTerms.DOSSIER_ID,
+					String.valueOf(dossierId));
 			viewURL.setParameter("isEditDossier", String.valueOf(false));
 			viewURL.setPlid(plId);
 			viewURL.setWindowState(WindowState.NORMAL);
 
-		}
-		else if (group.equals(NotificationEventKeys.GROUP3)) {
+		} else if (pattern.toUpperCase().contains(PortletKeys.EMPLOYEE) && paymentFileId > 0) {
 
-			if (plId <= 0) {
+			viewURL = liferayPortletResponse
+					.createRenderURL(WebKeys.PAYMENT_MANAGER_PORTLET);
 
-				layOut = LayoutLocalServiceUtil.getFriendlyURLLayout(groupId, true, group);
-
-				if (Validator.isNotNull(layOut)) {
-					plId = layOut.getPlid();
-				}
-
-			}
-
-			viewURL = liferayPortletResponse.createRenderURL(WebKeys.PAYMENT_MGT_PORTLET);
-
-			viewURL.setParameter(
-				"mvcPath", "/html/portlets/paymentmgt/frontoffice/frontofficepaymentdetail.jsp");
-			viewURL.setParameter(PaymentFileDisplayTerms.PAYMENT_FILE_ID, paymentFileId);
-			viewURL.setParameter(Constants.CMD, Constants.VIEW);
-			viewURL.setParameter(WebKeys.BACK_URL, "/group/guest" + group);
-			viewURL.setParameter(WebKeys.REDIRECT_URL, "/group/guest" + group);
+			viewURL.setParameter("mvcPath", "/html/portlets/paymentmgt/backoffice/backofficepaymentdetail.jsp");
+			viewURL.setParameter(PaymentFileDisplayTerms.PAYMENT_FILE_ID,
+					String.valueOf(paymentFileId));
 			viewURL.setPlid(plId);
 			viewURL.setWindowState(WindowState.NORMAL);
 
-		}
-		else if (group.equals(NotificationEventKeys.GROUP4)) {
+		} else if (pattern.toUpperCase().contains(PortletKeys.CITIZEN) && paymentFileId > 0) {
 
-			if (plId <= 0) {
-				layOut = LayoutLocalServiceUtil.getFriendlyURLLayout(groupId, true, group);
+			viewURL = liferayPortletResponse
+					.createRenderURL(WebKeys.PAYMENT_MGT_PORTLET);
 
-				if (Validator.isNotNull(layOut)) {
-					plId = layOut.getPlid();
-				}
-			}
-
-			viewURL = liferayPortletResponse.createRenderURL(WebKeys.PAYMENT_MANAGER_PORTLET);
-
-			viewURL.setParameter(
-				"mvcPath", "/html/portlets/paymentmgt/backoffice/backofficepaymentdetail.jsp");
-			viewURL.setParameter(PaymentFileDisplayTerms.PAYMENT_FILE_ID, paymentFileId);
-			viewURL.setParameter(Constants.CMD, Constants.VIEW);
-			viewURL.setParameter(WebKeys.REDIRECT_URL, "/group/guest");
+			viewURL.setParameter("mvcPath", "/html/portlets/paymentmgt/frontoffice/frontofficepaymentdetail.jsp");
+			viewURL.setParameter(PaymentFileDisplayTerms.PAYMENT_FILE_ID,
+					String.valueOf(paymentFileId));
 			viewURL.setPlid(plId);
 			viewURL.setWindowState(WindowState.NORMAL);
 

@@ -1,11 +1,3 @@
-<%@page import="org.opencps.notificationmgt.search.NotificationStatusConfigDisplayTerms"%>
-<%@page import="org.opencps.notificationmgt.search.NotificationEventConfigDisplayTerms"%>
-<%@page import="org.opencps.notificationmgt.service.NotificationEventConfigLocalServiceUtil"%>
-<%@page import="org.opencps.notificationmgt.model.NotificationEventConfig"%>
-<%@page import="org.opencps.notificationmgt.search.NotificationEventConfigSearch"%>
-<%@page import="com.liferay.portal.kernel.dao.search.SearchEntry"%>
-<%@page import="org.opencps.util.DateTimeUtil"%>
-<%@page import="com.liferay.portal.kernel.dao.orm.QueryUtil"%>
 <%
 	/**
 	 * OpenCPS is the open source Core Public Services software
@@ -31,82 +23,93 @@
 	servletContext="<%=application%>" />
 
 <%
-	long notiStatusConfigId = ParamUtil.getLong(request,NotificationStatusConfigDisplayTerms.NOTICE_CONFIG_ID,0);
+
+	long notiStatusId = ParamUtil.getLong(request, NotificationEventConfigDisplayTerms.NOTICE_STATUS_CONFIG_ID,0);
 	
 	PortletURL iteratorURL = renderResponse.createRenderURL();
-	iteratorURL.setParameter("mvcPath", templatePath
-	+ "backoffice/event/notification_event_config_list.jsp");
+	iteratorURL.setParameter("tabs1", PortletKeys.TOP_TABS_NOTI_CONFIG_EVENT);
+	iteratorURL.setParameter(NotificationEventConfigDisplayTerms.NOTICE_STATUS_CONFIG_ID, String.valueOf(notiStatusId));
 	
+
 %>
-<div
-	class="opencps-searchcontainer-wrapper-width-header default-box-shadow radius8">
-	
+
+<div class="opencps-searchcontainer-wrapper-width-header default-box-shadow radius8">
+
+	<liferay-ui:error key="<%= MessageKeys.NOTIFICATION_STATUS_SYSTEM_EXCEPTION_OCCURRED%>" 
+		message="<%=MessageKeys.NOTIFICATION_STATUS_SYSTEM_EXCEPTION_OCCURRED %>" />
+
 	<liferay-ui:search-container
 		searchContainer="<%=new NotificationEventConfigSearch(renderRequest,
 						SearchContainer.DEFAULT_DELTA, iteratorURL)%>">
-
+						
 		<liferay-ui:search-container-results>
 			<%
-				List<NotificationEventConfig> notificationEventConfigs = new ArrayList<NotificationEventConfig>();
-				
-				if(notiStatusConfigId > 0){
-					
-					notificationEventConfigs = NotificationEventConfigLocalServiceUtil.getByNotiStatusConfigIds(notiStatusConfigId);
-					
-				}else{
+			List<NotificationEventConfig> notiEventConfigs = new ArrayList<NotificationEventConfig>();
+			int totalSize = 0;
 			
-					notificationEventConfigs = NotificationEventConfigLocalServiceUtil
-											.getNotificationEventConfigs(searchContainer.getStart(),
-													searchContainer.getEnd());
-				}
+			if (notiStatusId > 0) {
+				notiEventConfigs = NotificationEventConfigLocalServiceUtil
+						.getByNotiStatusConfigIds(notiStatusId);
+
+				totalSize = NotificationEventConfigLocalServiceUtil
+						.countByNotiStatusConfigIds(notiStatusId);
+
+			}else{
+				notiEventConfigs = NotificationEventConfigLocalServiceUtil.getNotificationEventConfigs(searchContainer.getStart(),
+						searchContainer.getEnd());
 				
+				totalSize = NotificationEventConfigLocalServiceUtil.getNotificationEventConfigsCount();
+			}
 
-				int totalSize = notificationEventConfigs.size();
-
-				pageContext.setAttribute("results", notificationEventConfigs);
-				pageContext.setAttribute("total", totalSize);
+			pageContext.setAttribute("results", notiEventConfigs);
+			pageContext.setAttribute("total", totalSize);
 			%>
 
 		</liferay-ui:search-container-results>
 		<liferay-ui:search-container-row
 			className="org.opencps.notificationmgt.model.NotificationEventConfig"
-			modelVar="notificationEventConfig" keyProperty="notiEventConfigId">
+			modelVar="notiEventConfig" keyProperty="notiEventConfigId">
 			<%
-				PortletURL editURL = renderResponse.createRenderURL();
-						editURL.setParameter("mvcPath",
-								templatePath+"backoffice/event/notification_event_config_edit.jsp");
-						editURL.setParameter(NotificationEventConfigDisplayTerms.NOTICE_EVENT_CONFIG_ID,
-								String.valueOf(notificationEventConfig.getNotiEventConfigId()));
-						editURL.setParameter(WebKeys.BACK_URL, currentURL);
 
-						row.setClassName("opencps-searchcontainer-row");
-						row.addText(String.valueOf(row.getPos() +1),
-								editURL);
-						row.addText(DateTimeUtil.convertDateToString(
-								notificationEventConfig.getCreateDate(),
-								DateTimeUtil._VN_DATE_TIME_FORMAT), editURL);
-						row.addText(DateTimeUtil.convertDateToString(
-								notificationEventConfig.getModifiedDate(),
-								DateTimeUtil._VN_DATE_TIME_FORMAT), editURL);
-						row.addText(notificationEventConfig.getEventName(), editURL);
-						row.addText(notificationEventConfig.getDescription(), editURL);
-						row.addText(
-								String.valueOf(notificationEventConfig.isActive() == true ? LanguageUtil
-										.get(pageContext, "active") : LanguageUtil
-										.get(pageContext, "inactive")), editURL);
-						row.addJSP(
-								"center",
-								SearchEntry.DEFAULT_VALIGN,
-								templatePath+"backoffice/event/notification_event_config_actions.jsp",
-								config.getServletContext(), request, response);
+			row.setClassName("opencps-searchcontainer-row");
+
+			row.addText(String.valueOf(row.getPos() +1));
+			
+			NotificationStatusConfig notiStatus = new NotificationStatusConfigImpl();
+			
+			notiStatus = NotificationStatusConfigLocalServiceUtil.getNotificationStatusConfig(notiEventConfig.getNotiStatusConfigId());
+			
+			row.addText(DataMgtUtils.getDictItemName(themeDisplay.getScopeGroupId(),PortletPropsValues.DATAMGT_MASTERDATA_DOSSIER_STATUS
+					, notiStatus.getDossierNextStatus(), locale));
+			
+			row.addText(notiEventConfig.getEventName());
+			
+			row.addText(notiEventConfig.getDescription());
+			
+			row.addText(notiEventConfig.getPattern());
+			
+			row.addText(DateTimeUtil.convertDateToString(notiEventConfig.getCreateDate(),DateTimeUtil._VN_DATE_TIME_FORMAT));
+			
+			row.addText(DateTimeUtil.convertDateToString(notiEventConfig.getModifiedDate(),DateTimeUtil._VN_DATE_TIME_FORMAT));
+
+			row.addJSP(
+					"center",
+					SearchEntry.DEFAULT_VALIGN,
+					templatePath+"backoffice/event/notification_event_config_actions.jsp",
+					config.getServletContext(), request, response);
+			row.setParameter(WebKeys.REDIRECT_URL, iteratorURL);
 						
 			%>
+			
 
 		</liferay-ui:search-container-row>
 
-		<liferay-ui:search-iterator type="opencs_page_iterator" />
+		<liferay-ui:search-iterator type="opencs_page_iterator"/>
 	</liferay-ui:search-container>
+
 </div>
+
+
 
 <%!private static Log _log = LogFactoryUtil
 			.getLog("html.portlets.notificationmgt.backoffice.event.notification_event_config_list");%>

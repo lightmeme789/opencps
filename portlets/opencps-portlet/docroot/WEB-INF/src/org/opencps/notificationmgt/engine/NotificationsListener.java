@@ -37,7 +37,7 @@ package org.opencps.notificationmgt.engine;
 import java.util.List;
 
 import org.opencps.notificationmgt.message.SendNotificationMessage;
-import org.opencps.notificationmgt.message.SendNotificationMessage.InfoList;
+import org.opencps.notificationmgt.message.SendNotificationMessage.Infomations.Infomation;
 import org.opencps.notificationmgt.utils.NotificationEventKeys;
 import org.opencps.notificationmgt.utils.NotificationUtils;
 import org.opencps.util.MessageBusKeys;
@@ -48,7 +48,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
-import com.liferay.portal.kernel.util.StringPool;
 
 /**
  * @author nhanhoang
@@ -56,11 +55,11 @@ import com.liferay.portal.kernel.util.StringPool;
 
 public class NotificationsListener implements MessageListener {
 
-	private static Log _log = LogFactoryUtil.getLog(NotificationsListener.class);
+	private static Log _log = LogFactoryUtil
+			.getLog(NotificationsListener.class);
 
 	@Override
-	public void receive(Message message)
-		throws MessageListenerException {
+	public void receive(Message message) throws MessageListenerException {
 
 		_doRecevie(message);
 
@@ -70,70 +69,64 @@ public class NotificationsListener implements MessageListener {
 
 		try {
 
-			List<SendNotificationMessage> notifications =
-				(List<SendNotificationMessage>) message.get(MessageBusKeys.Message.NOTIFICATIONS);
-			
+			List<SendNotificationMessage> notifications = (List<SendNotificationMessage>) message
+					.get(MessageBusKeys.Message.NOTIFICATIONS);
+
 			_log.info("=====notifications.size():" + notifications.size());
 
-			String event = StringPool.BLANK;
-			String group = StringPool.BLANK;
-			String email = StringPool.BLANK;
-			String userName = StringPool.BLANK;;
-			String phone = StringPool.BLANK;
-			long groupId = 0;
-			long dossierId = 0;
-
 			/*
-			 * 1 notification message co the gui cho nhieu user, 1 user co the
-			 * nhan notice theo nhieu kenh
+			 * 1 notification message co the gui cho nhieu user, user co the
+			 * nhan noti theo 3 kenh email,inbox,sms
 			 */
 
 			for (SendNotificationMessage item : notifications) {
 
-				String sendType = item.getType().toUpperCase(); 
+				String patternConfig = item.getPatternConfig().toLowerCase();
 
-				event = item.getNotificationEventName();
+				SendNotificationMessage.Infomations infomationsOb = item
+						.getInfomations();
 
-				List<InfoList> infoList = item.getInfoList();
-				
+				List<Infomation> infoList = infomationsOb.getInfomation();
+
 				_log.info("=====infoList.size():" + infoList.size());
 
-				for (InfoList info : infoList) {
+				if (infoList.size() > 0) {
 
-						if (sendType.contains(NotificationEventKeys.EMAIL)) {
-							email = info.getUserMail();
-							dossierId = item.getDossierId();
-							userName = info.getFullName();
+					if (patternConfig.toUpperCase().contains(
+							NotificationEventKeys.EMAIL)) {
 
-							NotificationUtils.sendEmailNotification(item, email,dossierId,userName);
+						for (Infomation info : infoList) {
 
-						}
-						if (sendType.contains(NotificationEventKeys.INBOX)) {
-
-							group = info.getGroup();
-							groupId = info.getGroupId();
-
-							long userId = info.getUserId();
-
-							JSONObject payloadJSON =
-								NotificationUtils.createNotification(
-									item, event, group, userId, true,groupId);
-
-							NotificationUtils.addUserNotificationEvent(item, payloadJSON, userId);
-							_log.info("addUserNotificationEvent Success");
-							_log.info("payloadJSON:"+payloadJSON);
-						}
-						if (sendType.contains(NotificationEventKeys.SMS)) {
-							phone = info.getUserPhone();
+							NotificationUtils.sendEmailNotification(item, info);
 
 						}
-					
+
+					}
+
+					if (patternConfig.toUpperCase().contains(
+							NotificationEventKeys.INBOX)) {
+
+						for (Infomation info : infoList) {
+
+							JSONObject payloadJSON = NotificationUtils
+									.createNotification(item, info);
+
+							NotificationUtils.addUserNotificationEvent(item,
+									payloadJSON,
+									payloadJSON.getLong("userIdDelivery"));
+
+						}
+					}
+
+					if (patternConfig.toUpperCase().contains(
+							NotificationEventKeys.SMS)) {
+
+					}
 				}
 
 			}
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			_log.error(e);
 		}
 	}

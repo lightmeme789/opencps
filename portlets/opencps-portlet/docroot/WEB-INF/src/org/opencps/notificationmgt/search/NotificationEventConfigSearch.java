@@ -38,11 +38,13 @@ public class NotificationEventConfigSearch extends SearchContainer<DictItem> {
 	static List<String> headerNames = new ArrayList<String>();
 	static {
 		headerNames.add("row-index");
-		headerNames.add("create-date");
-		headerNames.add("modified-date");
+		headerNames.add("status");
 		headerNames.add("event-name");
 		headerNames.add("description");
-		headerNames.add("inuse");
+		headerNames.add("noti-types");
+		headerNames.add("create-date");
+		headerNames.add("modified-date");
+		headerNames.add("action");
 
 	}
 
@@ -56,9 +58,6 @@ public class NotificationEventConfigSearch extends SearchContainer<DictItem> {
 				new NotificationEventConfigSearchTerms(portletRequest),
 				DEFAULT_CUR_PARAM, delta, iteratorURL, headerNames,
 				EMPTY_RESULTS_MESSAGE);
-
-		// PortletConfig portletConfig = (PortletConfig)
-		// portletRequest.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
 
 		NotificationEventConfigDisplayTerms displayTerms = (NotificationEventConfigDisplayTerms) getDisplayTerms();
 

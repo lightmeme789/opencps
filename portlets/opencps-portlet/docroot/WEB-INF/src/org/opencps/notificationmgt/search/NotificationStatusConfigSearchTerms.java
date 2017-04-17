@@ -46,15 +46,17 @@ public class NotificationStatusConfigSearchTerms extends
 				DOSSIER_CURRENT_STATUS);
 		dossierNextStatus = ParamUtil.getString(portletRequest,
 				DOSSIER_NEXT_STATUS);
-		isSendNotification = ParamUtil.getBoolean(portletRequest,
-				IS_SEND_NOTIFICATION);
+		active = ParamUtil.getBoolean(portletRequest,
+				ACTIVE);
 
 	}
 
 	protected long notiStatusConfigId;
 	protected String dossierCurrentStatus;
 	protected String dossierNextStatus;
-	protected boolean isSendNotification;
+	protected boolean active;
+	
+
 	protected Date createDate;
 	protected Date modifiedDate;
 	protected long userId;
@@ -106,13 +108,13 @@ public class NotificationStatusConfigSearchTerms extends
 	public void setUserId(long userId) {
 		this.userId = userId;
 	}
-
-	public boolean isSendNotification() {
-		return isSendNotification;
+	
+	public boolean isActive() {
+		return active;
 	}
 
-	public void setSendNotification(boolean isSendNotification) {
-		this.isSendNotification = isSendNotification;
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }

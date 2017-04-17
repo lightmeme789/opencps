@@ -1,12 +1,3 @@
-<%@page import="com.liferay.portal.kernel.dao.search.SearchEntry"%>
-<%@page import="org.opencps.notificationmgt.search.NotificationStatusConfigDisplayTerms"%>
-<%@page import="org.opencps.notificationmgt.service.NotificationStatusConfigLocalServiceUtil"%>
-<%@page import="org.opencps.notificationmgt.model.impl.NotificationStatusConfigImpl"%>
-<%@page import="org.opencps.notificationmgt.model.NotificationStatusConfig"%>
-<%@page import="org.opencps.notificationmgt.permisson.NotificationStatusConfigPermission"%>
-<%@page import="org.opencps.notificationmgt.search.NotificationStatusConfigSearch"%>
-<%@page import="org.opencps.util.DateTimeUtil"%>
-<%@page import="com.liferay.portal.kernel.dao.orm.QueryUtil"%>
 <%
 	/**
 	 * OpenCPS is the open source Core Public Services software
@@ -32,9 +23,11 @@
 	servletContext="<%=application%>" />
 
 <%
+	long notiStatusId = ParamUtil.getLong(request, NotificationStatusConfigDisplayTerms.NOTICE_CONFIG_ID,0);	
+
 	PortletURL iteratorURL = renderResponse.createRenderURL();
-	iteratorURL.setParameter("mvcPath", templatePath
-	+ "backoffice/status/notification_status_config_list.jsp");
+	iteratorURL.setParameter("tabs1", PortletKeys.TOP_TABS_NOTI_CONFIG_STATUS);
+	iteratorURL.setParameter(NotificationStatusConfigDisplayTerms.NOTICE_CONFIG_ID, String.valueOf(notiStatusId));
 	
 %>
 <div
@@ -63,39 +56,28 @@
 			className="org.opencps.notificationmgt.model.NotificationStatusConfig"
 			modelVar="notificationStatusConfig" keyProperty="notiStatusConfigId">
 			<%
-				PortletURL editURL = renderResponse.createRenderURL();
-						editURL.setParameter("mvcPath",
-								templatePath+"backoffice/status/notification_status_config_edit.jsp");
-						editURL.setParameter(NotificationStatusConfigDisplayTerms.NOTICE_CONFIG_ID,
-								String.valueOf(notificationStatusConfig.getNotiStatusConfigId()));
-						editURL.setParameter(WebKeys.BACK_URL, currentURL);
 
-						row.setClassName("opencps-searchcontainer-row");
+				row.setClassName("opencps-searchcontainer-row");
 
-						row.addText(String.valueOf(row.getPos() +1),
-								editURL);
-						row.addText(DataMgtUtils.getDictItemName(themeDisplay.getScopeGroupId(),PortletPropsValues.DATAMGT_MASTERDATA_DOSSIER_STATUS
-								, notificationStatusConfig.getDossierNextStatus(), locale), editURL);
-						
-						row.addText(DateTimeUtil.convertDateToString(
-								notificationStatusConfig.getCreateDate(),
-								DateTimeUtil._VN_DATE_TIME_FORMAT), editURL);
-						
-						row.addText(DateTimeUtil.convertDateToString(
-								notificationStatusConfig.getModifiedDate(),
-								DateTimeUtil._VN_DATE_TIME_FORMAT), editURL);
-						
-						row.addText(
-								String.valueOf(notificationStatusConfig.getIsSendNotification() == true ? LanguageUtil
-										.get(pageContext, "active") : LanguageUtil
-										.get(pageContext, "inactive")), editURL);
+				row.addText(String.valueOf(row.getPos() +1));
+				row.addText(DataMgtUtils.getDictItemName(themeDisplay.getScopeGroupId(),PortletPropsValues.DATAMGT_MASTERDATA_DOSSIER_STATUS
+						, notificationStatusConfig.getDossierNextStatus(), locale));
+				
+				row.addText(DateTimeUtil.convertDateToString(
+						notificationStatusConfig.getCreateDate(),
+						DateTimeUtil._VN_DATE_TIME_FORMAT));
+				
+				row.addText(DateTimeUtil.convertDateToString(
+						notificationStatusConfig.getModifiedDate(),
+						DateTimeUtil._VN_DATE_TIME_FORMAT));
 
-						
-							row.addJSP(
-									"center",
-									SearchEntry.DEFAULT_VALIGN,
-									templatePath+"backoffice/status/notification_status_config_actions.jsp",
-									config.getServletContext(), request, response);
+				
+				row.addJSP(
+						"center",
+						SearchEntry.DEFAULT_VALIGN,
+						templatePath+"backoffice/status/notification_status_config_actions.jsp",
+						config.getServletContext(), request, response);
+				row.setParameter(WebKeys.REDIRECT_URL, iteratorURL);
 						
 			%>
 
@@ -106,4 +88,4 @@
 </div>
 
 <%!private static Log _log = LogFactoryUtil
-			.getLog("html.portlets.notificationmgt.backofficestatus..notification_status_config_list");%>
+			.getLog("html.portlets.notificationmgt.backoffice.status.notification_status_config_list");%>

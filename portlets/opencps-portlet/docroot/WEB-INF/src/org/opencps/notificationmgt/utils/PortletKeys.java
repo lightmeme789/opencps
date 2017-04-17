@@ -24,5 +24,11 @@ public class PortletKeys{
 
 	public static final String PREFER__ROOTGROUPID__ = "preferences--rootGroupId";
 
+	public static final String TOP_TABS_NOTI_CONFIG_STATUS = "noti_config_status_tab";
+	public static final String TOP_TABS_NOTI_CONFIG_EVENT = "noti_config_event_tab";
+	public static final String TOP_TABS_NOTI_CONFIG_REDIRECT = "noti_config_redirect_tab";
 	
+	public static final String CITIZEN = "CITIZEN";
+	public static final String EMPLOYEE = "EMPLOYEE";
+	public static final String USE_EVENT_DESCRIPTION = "USE_EVENT_DESCRIPTION";
 }

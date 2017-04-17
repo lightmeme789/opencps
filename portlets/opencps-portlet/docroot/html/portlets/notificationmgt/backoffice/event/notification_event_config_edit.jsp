@@ -1,19 +1,4 @@
-
-<%@page import="org.opencps.notificationmgt.search.NotificationStatusConfigDisplayTerms"%>
-<%@page import="org.opencps.notificationmgt.service.NotificationRedirectConfigLocalServiceUtil"%>
-<%@page import="org.opencps.notificationmgt.model.impl.NotificationRedirectConfigImpl"%>
-<%@page import="org.opencps.notificationmgt.model.NotificationRedirectConfig"%>
-<%@page import="com.liferay.portal.service.LayoutLocalServiceUtil"%>
-<%@page import="com.liferay.portal.model.Layout"%>
-<%@page import="org.opencps.util.LayoutView"%>
-<%@page import="org.opencps.util.LayoutLister"%>
-<%@page import="org.opencps.notificationmgt.service.NotificationEventConfigLocalServiceUtil"%>
-<%@page import="org.opencps.notificationmgt.model.impl.NotificationEventConfigImpl"%>
-<%@page import="org.opencps.notificationmgt.model.NotificationEventConfig"%>
-<%@page import="org.opencps.notificationmgt.search.NotificationEventConfigDisplayTerms"%>
-<%@page import="net.sf.jasperreports.util.NoWriteFieldHandler"%>
-<%@page import="org.opencps.util.PortletUtil"%>
-<%@page import="java.util.Date"%>
+<%@ include file="../../init.jsp"%>
 <%
 	/**
 	 * OpenCPS is the open source Core Public Services software
@@ -32,40 +17,27 @@
 	 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 	 */
 %>
-<%@page import="org.opencps.util.MessageKeys"%>
-<%@page import="org.opencps.util.WebKeys"%>
-<%@page import="com.liferay.portal.kernel.log.LogFactoryUtil"%>
-<%@page import="com.liferay.portal.kernel.log.Log"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="java.util.List"%>
-<%@page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
-<%@page import="javax.portlet.PortletRequest"%>
-<%@page import="com.liferay.portlet.PortletURLFactoryUtil"%>
-<%@ include file="../../init.jsp"%>
-
-<portlet:actionURL var="updateNotificationEventConfigURL" name="updateNotificationEventConfig" />
 
 <%
 	long notiEventConfigId = ParamUtil.getLong(request,NotificationEventConfigDisplayTerms.NOTICE_EVENT_CONFIG_ID,0);
 	String backURL = ParamUtil.getString(request, WebKeys.BACK_URL,StringPool.BLANK);
-	
-	long notiStatusConfigId = ParamUtil.getLong(request,NotificationStatusConfigDisplayTerms.NOTICE_CONFIG_ID,0);
 
-	NotificationEventConfig notiEventConfig = new NotificationEventConfigImpl();
-	NotificationRedirectConfig notiRedirectConfig = new NotificationRedirectConfigImpl();
+	NotificationEventConfig notiEventConfig = null;
 
 	if (notiEventConfigId > 0) {
 
 		try {
 			notiEventConfig = NotificationEventConfigLocalServiceUtil.fetchNotificationEventConfig(notiEventConfigId);
 			
-			if(Validator.isNotNull(notiEventConfig)){
-				
-				notiRedirectConfig = NotificationRedirectConfigLocalServiceUtil.fetchNotificationRedirectConfig(notiEventConfig.getNotiEventConfigId());
-			}
 		} catch (Exception e) {
-			_log.error(e);
+			
 		}
+	}
+	
+	boolean eventConfig = false;
+	
+	if(Validator.isNotNull(notiEventConfig)){
+		eventConfig = true;
 	}
 	
 	LayoutLister layoutLister = new LayoutLister();
@@ -75,11 +47,48 @@
 	LayoutView layoutView  = layoutLister.getLayoutView(layout.getGroupId(), layout.isPrivateLayout(), rootNodeName, locale);
 	
 	List layoutList = layoutView.getList();
+	
+	List<NotificationStatusConfig> notiStatusConfigs = new ArrayList<NotificationStatusConfig>();
+	
+	notiStatusConfigs = NotificationStatusConfigLocalServiceUtil.getNotificationStatusConfigs(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+	
+	///////////////////////////////////////////
+	String[] emailListException = StringUtil.split(notiEventConfig.getUserExcept());
+	
+	List leftList = new ArrayList();
+	
+	List<Employee> employees = new ArrayList<Employee>();
+	employees = EmployeeLocalServiceUtil.getEmployees(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+	
+	for(Employee employee1:employees){
+		if(!ArrayUtil.contains(emailListException, employee1.getEmail())){
+			KeyValuePair keyValuePair =  new KeyValuePair(employee1.getEmail(), employee1.getEmail());
+			leftList.add(keyValuePair);
+		}
+	}
+	
+	List rightList = new ArrayList();
+	
+	if(Validator.isNotNull(emailListException)){
+		
+		for(int i=0;i<emailListException.length;i++){
+			
+			try{
+				Employee employee2 = EmployeeLocalServiceUtil.getEmployeeByEmail(themeDisplay.getScopeGroupId(), emailListException[i]);
+				KeyValuePair keyValuePair =  new KeyValuePair(employee2.getEmail(), employee2.getEmail());
+				rightList.add(keyValuePair);
+			}catch(Exception e){
+				continue;
+			}
+		}
+		
+	}
+	////////////////////////////////////////////////
 %>
 
 <liferay-ui:header
-	title='<%=Validator.isNull(notiEventConfig) ? "add-notification-status-config"
-					: "update-notification-status-config"%>' />
+	title='<%=eventConfig? "add-notification-event-config"
+					: "update-notification-event-config"%>' />
 
 
 <div class=" opencps-bound-wrapper pd20 default-box-shadow"">
@@ -93,69 +102,121 @@
 		
 		<liferay-ui:success key="<%= MessageKeys.NOTIFICATION_STATUS_UPDATE_SUCESS%>" 
 		message="<%= MessageKeys.NOTIFICATION_STATUS_UPDATE_SUCESS%>"/>
+		
+		<portlet:actionURL var="updateNotificationEventConfigURL" name="updateNotificationEventConfig" />
 
 		<aui:form action="<%=updateNotificationEventConfigURL.toString()%>"
+			onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "getValueRightBox();" %>'> 
 			method="post" name="fm">
 
 			<aui:model-context bean="<%=notiEventConfig%>"
 				model="<%=NotificationEventConfig.class%>" />
+				
 			<aui:input name="<%=NotificationEventConfigDisplayTerms.NOTICE_EVENT_CONFIG_ID%>"
 				type="hidden"
-				value="<%=String.valueOf(notiEventConfig.getNotiEventConfigId()) %>" />
+				value="<%=eventConfig ? String.valueOf(notiEventConfig.getNotiEventConfigId()):StringPool.BLANK %>" />
 				
-			<aui:input name="<%=NotificationStatusConfigDisplayTerms.NOTICE_CONFIG_ID%>"
-				type="hidden" 
-				value="<%=String.valueOf(notiStatusConfigId) %>"/>
 			<aui:input name="<%=WebKeys.BACK_URL%>" type="hidden"
 				value="<%=backURL%>" />
+				
 			<aui:input name="<%=WebKeys.CURRENT_URL%>" type="hidden"
 				value="<%=currentURL%>" />
+				
+			<aui:select  name="<%=NotificationStatusConfigDisplayTerms.NOTICE_CONFIG_ID%>"
+				label="noti-status-config">
+				<%
+					for (NotificationStatusConfig notiStatusConfig : notiStatusConfigs) {
+							
+						boolean statusSelect = false;
+						
+							if (eventConfig) {
+
+								if (notiStatusConfig.getNotiStatusConfigId() == notiEventConfig
+										.getNotiStatusConfigId()) {
+									
+									statusSelect = true;
+								}
+							}
+				%>
+
+				<aui:option selected="<%=true%>"
+					value="<%=notiStatusConfig.getNotiStatusConfigId()%>"
+				>
+					<%=DataMgtUtils.getDictItemName(themeDisplay.getScopeGroupId(),PortletPropsValues.DATAMGT_MASTERDATA_DOSSIER_STATUS
+									,notiStatusConfig.getDossierNextStatus(), locale)%>
+				</aui:option>
+
+				<%
+				}
+				%>
+			</aui:select>
+			
 			<aui:fieldset>
 			
-				<aui:input type="text" name="<%=NotificationEventConfigDisplayTerms.EVENT_NAME %>" value="<%=notiEventConfig.getEventName() %>"/>
+				<aui:input type="text" name="<%=NotificationEventConfigDisplayTerms.EVENT_NAME %>" 
+				value="<%=eventConfig ? notiEventConfig.getEventName():StringPool.BLANK %>"
+				title="event-name"/>
 				
-				<aui:input type="text" name="<%=NotificationEventConfigDisplayTerms.DESCRIPTION %>" value="<%=notiEventConfig.getDescription() %>"/>
+				<aui:input type="text" name="<%=NotificationEventConfigDisplayTerms.DESCRIPTION %>" 
+				value="<%=eventConfig ? notiEventConfig.getDescription() :StringPool.BLANK %>"
+				title="description"/>
 				
-				<aui:input type="text" name="<%=NotificationEventConfigDisplayTerms.PATTERN %>" value="<%=notiEventConfig.getPattern() %>"/>
+				<aui:input type="text" name="<%=NotificationEventConfigDisplayTerms.PATTERN %>" 
+				value="<%=eventConfig ? notiEventConfig.getPattern() :StringPool.BLANK %>"
+				title="pattern">
+					<liferay-ui:icon-help message="tooltip-one"/>
+				</aui:input>
+				
 	
-				<aui:select label="root-layout" name="<%=NotificationEventConfigDisplayTerms.NOTICE_REDIRECT_CONFIG_ID %>">
+				<aui:select label="page-redirect" name="<%=NotificationEventConfigDisplayTerms.NOTICE_REDIRECT_CONFIG_ID %>">
 					<aui:option value="" />
 
 				<%
-				for (int i = 0; i < layoutList.size(); i++) {
-	
-					// id | parentId | ls | obj id | name | img | depth
-	
-					String layoutDesc = (String)layoutList.get(i);
-	
-					String[] nodeValues = StringUtil.split(layoutDesc, '|');
-	
-					long objId = GetterUtil.getLong(nodeValues[3]);
-					String name = HtmlUtil.escape(nodeValues[4]);
-	
-					int depth = 0;
-	
-					if (i != 0) {
-						depth = GetterUtil.getInteger(nodeValues[6]);
-					}
-	
-					for (int j = 0; j < depth; j++) {
-						name = "-&nbsp;" + name;
-					}
-	
-					Layout curRootLayout = null;
-	
-					try {
-						curRootLayout = LayoutLocalServiceUtil.getLayout(objId);
-					}
-					catch (Exception e) {
-					}
-	
-					if (curRootLayout != null) {
+					for (int i = 0; i < layoutList.size(); i++) {
+					
+							// id | parentId | ls | obj id | name | img | depth
+					
+							String layoutDesc = (String)layoutList.get(i);
+					
+							String[] nodeValues = StringUtil.split(layoutDesc, '|');
+					
+							long objId = GetterUtil.getLong(nodeValues[3]);
+							String name = HtmlUtil.escape(nodeValues[4]);
+					
+							int depth = 0;
+					
+							if (i != 0) {
+								depth = GetterUtil.getInteger(nodeValues[6]);
+							}
+					
+							for (int j = 0; j < depth; j++) {
+								name = "-&nbsp;" + name;
+							}
+					
+							Layout curRootLayout = null;
+					
+							try {
+								curRootLayout = LayoutLocalServiceUtil.getLayout(objId);
+							}
+							catch (Exception e) {
+							}
+					
+							if (curRootLayout != null) {
+								
+								boolean select = false;
+								
+								if(eventConfig){
+									
+											if (curRootLayout.getPlid() == Long
+													.valueOf(notiEventConfig.getPlId())) {
+
+												select = true;
+											}
+										}
 				%>
 	
 					<aui:option label="<%= name %>" 
-						selected="<%=Validator.isNotNull(notiRedirectConfig)? curRootLayout.getPlid() ==notiRedirectConfig.getPlId():false %>" 
+						selected="<%=select%>" 
 						value="<%= curRootLayout.getPlid() %>" />
 	
 				<%
@@ -165,36 +226,43 @@
 
 				</aui:select>
 				
+				<aui:fieldset label="dossier-status-treemenu-display">
+						<liferay-ui:input-move-boxes
+							leftBoxName="availableEmployeeUser"
+							leftList="<%= leftList %>"
+							leftReorder="true"
+							leftTitle="employee-list"
+							rightBoxName="userExceptList"
+							rightList="<%= rightList %>"
+							rightTitle="employee-except"
+							rightReorder="true"
+						
+						/>
+				</aui:fieldset>
+				<aui:input name="userExceptListValues" type="hidden"></aui:input>
 				<aui:input name="<%=NotificationEventConfigDisplayTerms.ACTIVE%>" 
 							type="checkbox" 
 							label="inuse" 
-							value="<%=Validator.isNotNull(notiRedirectConfig) ?notiRedirectConfig.isActive():false %>"></aui:input>
-				
-			
-			
-<%-- 			<aui:select name="<%=NotificationEventConfigDisplayTerms.JSP_REDIRECT %>"> --%>
-<%-- 				<aui:option  --%>
-<%-- 					selected="<%=Validator.isNotNull(notiRedirectConfig) ? notiRedirectConfig.getJspRedirect().equals("/html/portlets/processmgt/processorder/process_order_detail.jsp"):false %>"  --%>
-<%-- 					value='<%=HtmlUtil.escape("/html/portlets/processmgt/processorder/process_order_detail.jsp") %>'/> --%>
-<%-- 				<aui:option --%>
-<%-- 					selected="<%=Validator.isNotNull(notiRedirectConfig) ? notiRedirectConfig.getJspRedirect().equals("/html/portlets/dossiermgt/frontoffice/edit_dossier.jsp"):false %>" --%>
-<%-- 					value='<%=HtmlUtil.escape("/html/portlets/dossiermgt/frontoffice/edit_dossier.jsp") %>' --%>
-<%-- 					/> --%>
-<%-- 				<aui:option --%>
-<%-- 					selected="<%=Validator.isNotNull(notiRedirectConfig) ? notiRedirectConfig.getJspRedirect().equals("/html/portlets/paymentmgt/frontoffice/frontofficepaymentdetail.jsp"):false %>" --%>
-<%-- 					value='<%=HtmlUtil.escape("/html/portlets/paymentmgt/frontoffice/frontofficepaymentdetail.jsp") %>' --%>
-<%-- 				 	/> --%>
-<%-- 				<aui:option --%>
-<%-- 					selected="<%=Validator.isNotNull(notiRedirectConfig) ? notiRedirectConfig.getJspRedirect().equals("/html/portlets/paymentmgt/backoffice/backofficepaymentdetail.jsp"):false %>" --%>
-<%-- 					value='<%=HtmlUtil.escape("/html/portlets/paymentmgt/backoffice/backofficepaymentdetail.jsp") %>' --%>
-<%-- 				 	/> --%>
-<%-- 			</aui:select> --%>
-
+							value="<%=eventConfig ?notiEventConfig.isActive():false %>"></aui:input>
+							
 				<aui:button type="submit" name="submit" icon="icon-save" />
 			</aui:fieldset>
 		</aui:form>
 	</div>
 </div>
+
+<aui:script>
+	
+	Liferay.provide(window, '<portlet:namespace />getValueRightBox', function() {
+		var A = AUI();
+		var userExceptList = Liferay.Util.listSelect(document.<portlet:namespace />fm.<portlet:namespace />userExceptList);
+		var userExceptListValues = A.one('#<portlet:namespace />userExceptListValues');
+		 console.log("userExceptList:"+userExceptList);
+		 console.log("userExceptListValues:"+userExceptListValues);
+		userExceptListValues.val(userExceptList);
+		submitForm(document.<portlet:namespace />fm);
+	}, ['liferay-util-list-fields']);
+</aui:script>
 
 <%!private Log _log = LogFactoryUtil
 			.getLog("html.portlets.notificationmgt.backoffice.notification_status_config_edit");%>

@@ -36,8 +36,8 @@ public class NotificationStatusConfigDisplayTerms extends DisplayTerms {
 	public static final String DOSSIER_NEXT_STATUS = "dossierNextStatus";
 
 	public static final String DOSSIER_CURRENT_STATUS = "dossierCurrentStatus";
-
-	public static final String IS_SEND_NOTIFICATION = "isSendNotificaton";
+	
+	public static final String ACTIVE = "active";
 
 	public static final String CREATE_DATE = "createDate";
 
@@ -60,17 +60,25 @@ public class NotificationStatusConfigDisplayTerms extends DisplayTerms {
 				DOSSIER_CURRENT_STATUS);
 		dossierNextStatus = ParamUtil.getString(portletRequest,
 				DOSSIER_NEXT_STATUS);
-		isSendNotification = ParamUtil.getBoolean(portletRequest,
-				IS_SEND_NOTIFICATION);
+		active = ParamUtil.getBoolean(portletRequest,
+				ACTIVE);
 	}
 
 	protected long notiStatusConfigId;
 	protected String dossierCurrentStatus;
 	protected String dossierNextStatus;
-	protected boolean isSendNotification;
 	protected Date createDate;
 	protected Date modifiedDate;
 	protected long userId;
+	protected boolean active;
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
 
 	public long getNotiStatusConfigId() {
 		return notiStatusConfigId;
@@ -118,14 +126,6 @@ public class NotificationStatusConfigDisplayTerms extends DisplayTerms {
 
 	public void setUserId(long userId) {
 		this.userId = userId;
-	}
-
-	public boolean isSendNotification() {
-		return isSendNotification;
-	}
-
-	public void setSendNotification(boolean isSendNotification) {
-		this.isSendNotification = isSendNotification;
 	}
 
 }

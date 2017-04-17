@@ -23,28 +23,28 @@
 
 		<column name="dossierCurrentStatus" type="String" />
 		<column name="dossierNextStatus" type="String" />
-		<column name="isSendNotification" type="boolean"></column>
+		<column name="active" type="boolean"></column>
 		
 		<!-- Finder methods -->
 		<finder return-type="NotificationStatusConfig" name="C_N_S" >
 			<finder-column name="dossierCurrentStatus" />
 			<finder-column name="dossierNextStatus" />
-			<finder-column name="isSendNotification" />
+			<finder-column name="active" />
 		</finder>
 		
 		<finder return-type="Collection" name="C_S" >
 			<finder-column name="dossierCurrentStatus" />
-			<finder-column name="isSendNotification" />
+			<finder-column name="active" />
 		</finder>
 		
 		<finder return-type="Collection" name="N_S" >
 			<finder-column name="dossierNextStatus" />
-			<finder-column name="isSendNotification" />
+			<finder-column name="active" />
 		</finder>
 		
 		<finder return-type="NotificationStatusConfig" name="DossierNextStatus" >
 			<finder-column name="dossierNextStatus" />
-			<finder-column name="isSendNotification" />
+			<finder-column name="active" />
 		</finder>
 		
 		<finder return-type="NotificationStatusConfig" name="DS_" >
@@ -73,6 +73,9 @@
 		<column name="eventName" type="String"></column>
 		<column name="description" type="String"></column>
 		<column name="pattern" type="String"></column>
+		<column name="userExcept" type="String"></column>
+		<column name="plId" type="String"></column>
+		<column name="jspRedirect" type="String"></column>
 		<column name="active" type="boolean"></column>
 		
 		<!-- Finder methods -->
