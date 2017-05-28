@@ -52,7 +52,6 @@
 						scopeGroupId, dossiersStatistics, fieldDatasShemas,
 						StringPool.BLANK, startMonth, startYear, period, currentMonth, currentYear, 0, 
 						0, locale);
-	System.out.println(jsonArray.toString());
 %>
 
 <c:choose>

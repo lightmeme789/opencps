@@ -39,7 +39,7 @@
 	int startMonth = GetterUtil.getInteger(portletPreferences
 		.getValue("startMonth", String.valueOf(1)));
 	
-	System.out.println("############################################# MONTHLY" + startMonth);
+	
 	
 	int startYear = GetterUtil.getInteger(portletPreferences
 		.getValue("startYear", String.valueOf(1)));

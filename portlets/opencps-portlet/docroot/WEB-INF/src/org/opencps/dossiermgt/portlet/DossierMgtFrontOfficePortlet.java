@@ -3167,9 +3167,13 @@ public class DossierMgtFrontOfficePortlet extends MVCPortlet {
 
 			_log.error(e);
 		} finally {
-			if (!isUpdateStatusSuccessFlag) {
-
-				if (Validator.isNotNull(redirectURL)) {
+			if (isUpdateStatusSuccessFlag) {
+				
+				if (Validator.isNotNull(backURL)) {
+					actionResponse.sendRedirect(backURL);
+					
+				} else if (Validator.isNotNull(redirectURL)) {
+					
 					actionResponse.sendRedirect(redirectURL);
 				}
 

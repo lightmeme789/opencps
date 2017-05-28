@@ -83,7 +83,7 @@
 									<span class="span9">
 										<%=
 											Validator.isNotNull(dossierFile.getDossierFileDate()) ? 
-											DateTimeUtil.convertDateToString(dossierFile.getDossierFileDate(), DateTimeUtil._VN_DATE_TIME_FORMAT) : 
+											DateTimeUtil.convertDateToString(dossierFile.getDossierFileDate(), DateTimeUtil._VN_DATE_FORMAT) : 
 											DateTimeUtil._EMPTY_DATE_TIME
 										%>
 									</span>

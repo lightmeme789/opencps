@@ -1,3 +1,4 @@
+<%@page import="org.opencps.util.DateTimeUtil"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%
 /**
@@ -62,8 +63,6 @@
 	}
 	
 	Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
-	
-	SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy | hh:MM:ss");
 
 	String keywordSearch = ParamUtil.getString(request, "keywords", StringPool.BLANK);
 %>
@@ -197,11 +196,11 @@
 						if (!dossierLog.getDossierStatus().equalsIgnoreCase(
 								"system")
 								&& !dossierLog.getDossierStatus().equalsIgnoreCase(
-										"error")) {
+										"error")) {					
 			%>
 			<div class="date">
 				<p>
-					<%= (Validator.isNotNull(dossierLog.getUpdateDatetime())) ? sdf.format(dossierLog.getUpdateDatetime()) : StringPool.BLANK %>
+					<%= Validator.isNotNull(dossierLog.getModifiedDate()) ? DateTimeUtil.convertDateToString(dossierLog.getModifiedDate(), DateTimeUtil._VN_DATE_TIME_FORMAT) : StringPool.BLANK %>
 				</p>
 				<p>
 					<%= Validator.isNotNull(dossierLog.getDossierStatus())? LanguageUtil.get(pageContext, dossierLog.getDossierStatus()+"-cus"):StringPool.BLANK %>

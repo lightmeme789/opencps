@@ -139,7 +139,6 @@
 		}
 	}
 	
-	System.out.println("######################################### " + dossierPart.getPartName() + " | " + dossierPart.getPartType());
 	
 	String formData = "";
 	

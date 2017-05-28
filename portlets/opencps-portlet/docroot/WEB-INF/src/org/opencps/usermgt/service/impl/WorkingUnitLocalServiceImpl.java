@@ -215,6 +215,10 @@ public class WorkingUnitLocalServiceImpl
 			WorkingUnit unit = workingUnitPersistence
 					.findByPrimaryKey(workingUnitId);
 			try {
+				
+				_log.info("test:"+OrganizationLocalServiceUtil
+						.getOrganizations(unit.getCompanyId(), unit.getMappingOrganisationId())
+						.isEmpty());
 				if (OrganizationLocalServiceUtil
 						.getOrganizations(unit.getCompanyId(), unit.getMappingOrganisationId())
 						.isEmpty()) {

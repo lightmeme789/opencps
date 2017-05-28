@@ -55,7 +55,6 @@
 		business = (Business) request.getAttribute(WebKeys.BUSINESS_ENTRY);
 	}
 
-	System.out.println("businessregistration-ux.jsp");
 
 	long businessId = business!=null ? business.getBusinessId() : 0L;
 	
@@ -476,8 +475,10 @@
 						<aui:input 
 							name="termsOfUse"
 							type="checkbox" 
-							label="<%= LanguageUtil.format(pageContext, \"terms-of-use-x\", chiTiet ) %>"
-						/>
+							label='<%= LanguageUtil.get(themeDisplay.getLocale(), "terms-of-use") %>'
+						>
+							<a href="javascript:void(0)"  onclick="<%=popupURL%>" class="detail-terms-links"><%=LanguageUtil.get(themeDisplay.getLocale(), "term-detail")%></a>
+						</aui:input>
 					</aui:row>
 				</div>
 			</div>

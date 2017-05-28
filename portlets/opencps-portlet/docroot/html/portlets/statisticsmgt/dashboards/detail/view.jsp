@@ -80,7 +80,7 @@
 	
 	if(codes != null && !codes.isEmpty()){
 		domainCodes = StringUtil.merge(codes);
-		System.out.println(domainCodes);
+		
 	}
 
 	List<DossiersStatistics> dossiersStatistics =

@@ -35,13 +35,19 @@ import com.liferay.util.dao.orm.CustomSQLUtil;
  * @author khoavd
  */
 public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
-    implements ServiceInfoFinder {
+		implements ServiceInfoFinder {
 
-	public static final String SEARCH_SERVICE_SQL =
-	    ServiceInfoFinder.class.getName() + ".searchService";
+	public static final String SEARCH_SERVICE_SQL = ServiceInfoFinder.class
+			.getName() + ".searchService";
 
-	public static final String COUNT_SERVICE_SQL =
-	    ServiceInfoFinder.class.getName() + ".countService";
+	public static final String COUNT_SERVICE_SQL = ServiceInfoFinder.class
+			.getName() + ".countService";
+
+	public static final String SEARCH_SERVICE_ACTIVE_SQL = ServiceInfoFinder.class
+			.getName() + ".searchServiceActive";
+
+	public static final String COUNT_SERVICE_ACTIVE_SQL = ServiceInfoFinder.class
+			.getName() + ".countServiceActive";
 
 	/**
 	 * @param groupId
@@ -50,22 +56,20 @@ public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
 	 * @param domainCode
 	 * @return
 	 */
-	public int countService(
-	    long groupId, String keywords, String administrationCode,
-	    String domainCode) {
+	public int countService(long groupId, String keywords,
+			String administrationCode, String domainCode) {
 
-		//String[] names = null;
+		// String[] names = null;
 		boolean andOperator = false;
 
 		if (Validator.isNotNull(keywords)) {
-			//names = CustomSQLUtil.keywords(keywords);
-		}
-		else {
+			// names = CustomSQLUtil.keywords(keywords);
+		} else {
 			andOperator = true;
 		}
 
-		return _countService(
-		    groupId, keywords, administrationCode, domainCode, andOperator);
+		return _countService(groupId, keywords, administrationCode, domainCode,
+				andOperator);
 	}
 
 	/**
@@ -77,23 +81,20 @@ public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
 	 * @param end
 	 * @return
 	 */
-	public List<ServiceInfo> searchService(
-	    long groupId, String keywords, String administrationCode,
-	    String domainCode, int start, int end) {
+	public List<ServiceInfo> searchService(long groupId, String keywords,
+			String administrationCode, String domainCode, int start, int end) {
 
-		//String[] names = null;
+		// String[] names = null;
 		boolean andOperator = false;
 
 		if (Validator.isNotNull(keywords)) {
-			//names = CustomSQLUtil.keywords(keywords);
-		}
-		else {
+			// names = CustomSQLUtil.keywords(keywords);
+		} else {
 			andOperator = true;
 		}
 
-		return _searchService(
-		    groupId, keywords, administrationCode, domainCode, andOperator, start,
-		    end);
+		return _searchService(groupId, keywords, administrationCode,
+				domainCode, andOperator, start, end);
 	}
 
 	/**
@@ -106,11 +107,11 @@ public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
 	 * @param end
 	 * @return
 	 */
-	private List<ServiceInfo> _searchService(
-	    long groupId, String keyword, String adminCode, String domainCode,
-	    boolean andOperator, int start, int end) {
+	private List<ServiceInfo> _searchService(long groupId, String keyword,
+			String adminCode, String domainCode, boolean andOperator,
+			int start, int end) {
 
-		//keywords = CustomSQLUtil.keywords(keywords);
+		// keywords = CustomSQLUtil.keywords(keywords);
 
 		Session session = null;
 		try {
@@ -118,40 +119,42 @@ public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
 
 			String sql = CustomSQLUtil.get(SEARCH_SERVICE_SQL);
 
-			/*sql =
-			    CustomSQLUtil.replaceKeywords(
-			        sql, "lower(opencps_serviceinfo.serviceName)",
-			        StringPool.LIKE, true, keywords);
+			/*
+			 * sql = CustomSQLUtil.replaceKeywords( sql,
+			 * "lower(opencps_serviceinfo.serviceName)", StringPool.LIKE, true,
+			 * keywords);
+			 * 
+			 * sql = CustomSQLUtil.replaceKeywords( sql,
+			 * "lower(opencps_serviceinfo.fullName)", StringPool.LIKE, true,
+			 * keywords);
+			 * 
+			 * sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
+			 */
 
-			sql =
-			    CustomSQLUtil.replaceKeywords(
-			        sql, "lower(opencps_serviceinfo.fullName)",
-			        StringPool.LIKE, true, keywords);
-
-			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);*/
-			
-			if(Validator.isNull(keyword)){
-				sql = StringUtil.replace(sql,
-				        "AND ((lower(opencps_serviceinfo.serviceName) LIKE ?) OR (lower(opencps_serviceinfo.fullName) LIKE ?))",
-				        StringPool.BLANK);
+			if (Validator.isNull(keyword)) {
+				sql = StringUtil
+						.replace(
+								sql,
+								"AND ((lower(opencps_serviceinfo.serviceName) LIKE ?) OR (lower(opencps_serviceinfo.fullName) LIKE ?))",
+								StringPool.BLANK);
 			}
 
 			// remove condition query
-			if (Validator.equals(adminCode, "0") || Validator.equals(adminCode, StringPool.BLANK)) {
-				sql =
-				    StringUtil.replace(
-				        sql,
-				        "AND (opencps_serviceinfo.administrationCode = ?)",
-				        StringPool.BLANK);
+			if (Validator.equals(adminCode, "0")
+					|| Validator.equals(adminCode, StringPool.BLANK)) {
+				sql = StringUtil.replace(sql,
+						"AND (opencps_serviceinfo.administrationCode = ?)",
+						StringPool.BLANK);
 			}
 
-			if (Validator.equals(domainCode, "0") || Validator.equals(domainCode, StringPool.BLANK)) {
-				sql =
-				    StringUtil.replace(
-				        sql, "AND ((opencps_serviceinfo.domainCode = ?) OR (opencps_serviceinfo.domainIndex like ?))",
-				        StringPool.BLANK);
+			if (Validator.equals(domainCode, "0")
+					|| Validator.equals(domainCode, StringPool.BLANK)) {
+				sql = StringUtil
+						.replace(
+								sql,
+								"AND ((opencps_serviceinfo.domainCode = ?) OR (opencps_serviceinfo.domainIndex like ?))",
+								StringPool.BLANK);
 			}
-			
 
 			SQLQuery q = session.createSQLQuery(sql);
 
@@ -162,35 +165,34 @@ public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			qPos.add(groupId);
-			
-			if(Validator.isNotNull(keyword)){
-				qPos.add("%"+keyword+"%");
-				
-				qPos.add("%"+keyword+"%");
+
+			if (Validator.isNotNull(keyword)) {
+				qPos.add("%" + keyword + "%");
+
+				qPos.add("%" + keyword + "%");
 			}
 
-			
-			if (!Validator.equals(adminCode, "0") && !Validator.equals(adminCode, StringPool.BLANK) ) {
+			if (!Validator.equals(adminCode, "0")
+					&& !Validator.equals(adminCode, StringPool.BLANK)) {
 				qPos.add(adminCode);
 			}
 
-			if (!Validator.equals(domainCode, "0") && !Validator.equals(domainCode, StringPool.BLANK)) {
+			if (!Validator.equals(domainCode, "0")
+					&& !Validator.equals(domainCode, StringPool.BLANK)) {
 				qPos.add(domainCode);
-				qPos.add(StringPool.PERCENT+domainCode+StringPool.PERIOD+StringPool.PERCENT);
+				qPos.add(StringPool.PERCENT + domainCode + StringPool.PERIOD
+						+ StringPool.PERCENT);
 			}
 
-			return (List<ServiceInfo>) QueryUtil.list(
-			    q, getDialect(), start, end);
-		}
-		catch (Exception e) {
+			return (List<ServiceInfo>) QueryUtil.list(q, getDialect(), start,
+					end);
+		} catch (Exception e) {
 			try {
 				throw new SystemException(e);
-			}
-			catch (SystemException se) {
+			} catch (SystemException se) {
 				se.printStackTrace();
 			}
-		}
-		finally {
+		} finally {
 			closeSession(session);
 		}
 
@@ -206,11 +208,10 @@ public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
 	 * @param andOperator
 	 * @return
 	 */
-	private int _countService(
-	    long groupId, String keyword, String adminCode, String domainCode,
-	    boolean andOperator) {
+	private int _countService(long groupId, String keyword, String adminCode,
+			String domainCode, boolean andOperator) {
 
-		//keywords = CustomSQLUtil.keywords(keywords);
+		// keywords = CustomSQLUtil.keywords(keywords);
 
 		Session session = null;
 		try {
@@ -218,38 +219,41 @@ public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
 
 			String sql = CustomSQLUtil.get(COUNT_SERVICE_SQL);
 
-			/*sql =
-			    CustomSQLUtil.replaceKeywords(
-			        sql, "lower(opencps_serviceinfo.serviceName)",
-			        StringPool.LIKE, true, keywords);
+			/*
+			 * sql = CustomSQLUtil.replaceKeywords( sql,
+			 * "lower(opencps_serviceinfo.serviceName)", StringPool.LIKE, true,
+			 * keywords);
+			 * 
+			 * sql = CustomSQLUtil.replaceKeywords( sql,
+			 * "lower(opencps_serviceinfo.fullName)", StringPool.LIKE, true,
+			 * keywords);
+			 * 
+			 * sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);
+			 */
 
-			sql =
-			    CustomSQLUtil.replaceKeywords(
-			        sql, "lower(opencps_serviceinfo.fullName)",
-			        StringPool.LIKE, true, keywords);
-
-			sql = CustomSQLUtil.replaceAndOperator(sql, andOperator);*/
-			
-			if(Validator.isNull(keyword)){
-				sql = StringUtil.replace(sql,
-				        "AND ((lower(opencps_serviceinfo.serviceName) LIKE ?) OR (lower(opencps_serviceinfo.fullName) LIKE ?))",
-				        StringPool.BLANK);
+			if (Validator.isNull(keyword)) {
+				sql = StringUtil
+						.replace(
+								sql,
+								"AND ((lower(opencps_serviceinfo.serviceName) LIKE ?) OR (lower(opencps_serviceinfo.fullName) LIKE ?))",
+								StringPool.BLANK);
 			}
 
 			// remove condition query
-			if (Validator.equals(adminCode, "0") || Validator.equals(adminCode, StringPool.BLANK)) {
-				sql =
-				    StringUtil.replace(
-				        sql,
-				        "AND (opencps_serviceinfo.administrationCode = ?)",
-				        StringPool.BLANK);
+			if (Validator.equals(adminCode, "0")
+					|| Validator.equals(adminCode, StringPool.BLANK)) {
+				sql = StringUtil.replace(sql,
+						"AND (opencps_serviceinfo.administrationCode = ?)",
+						StringPool.BLANK);
 			}
 
-			if (Validator.equals(domainCode, "0") || Validator.equals(domainCode, StringPool.BLANK)) {
-				sql =
-				    StringUtil.replace(
-				        sql, "AND ((opencps_serviceinfo.domainCode = ?) OR (opencps_serviceinfo.domainIndex like ?))",
-				        StringPool.BLANK);
+			if (Validator.equals(domainCode, "0")
+					|| Validator.equals(domainCode, StringPool.BLANK)) {
+				sql = StringUtil
+						.replace(
+								sql,
+								"AND ((opencps_serviceinfo.domainCode = ?) OR (opencps_serviceinfo.domainIndex like ?))",
+								StringPool.BLANK);
 			}
 
 			SQLQuery q = session.createSQLQuery(sql);
@@ -262,19 +266,22 @@ public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
 
 			qPos.add(groupId);
 
-			if(Validator.isNotNull(keyword)){
-				qPos.add("%"+keyword+"%");
-				
-				qPos.add("%"+keyword+"%");
+			if (Validator.isNotNull(keyword)) {
+				qPos.add("%" + keyword + "%");
+
+				qPos.add("%" + keyword + "%");
 			}
 
-			if (!Validator.equals(adminCode, "0") && !Validator.equals(adminCode, StringPool.BLANK) ) {
+			if (!Validator.equals(adminCode, "0")
+					&& !Validator.equals(adminCode, StringPool.BLANK)) {
 				qPos.add(adminCode);
 			}
 
-			if (!Validator.equals(domainCode, "0") && !Validator.equals(domainCode, StringPool.BLANK)) {
+			if (!Validator.equals(domainCode, "0")
+					&& !Validator.equals(domainCode, StringPool.BLANK)) {
 				qPos.add(domainCode);
-				qPos.add(StringPool.PERCENT+domainCode+StringPool.PERIOD+StringPool.PERCENT);
+				qPos.add(StringPool.PERCENT + domainCode + StringPool.PERIOD
+						+ StringPool.PERCENT);
 			}
 
 			Iterator<Integer> itr = q.iterate();
@@ -289,16 +296,249 @@ public class ServiceInfoFinderImpl extends BasePersistenceImpl<ServiceInfo>
 
 			return 0;
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			try {
 				throw new SystemException(e);
-			}
-			catch (SystemException se) {
+			} catch (SystemException se) {
 				se.printStackTrace();
 			}
+		} finally {
+			closeSession(session);
 		}
-		finally {
+
+		return 0;
+	}
+
+	/**
+	 * @param groupId
+	 * @param keywords
+	 * @param administrationCode
+	 * @param domainCode
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public List<ServiceInfo> searchServiceActive(long groupId, String keywords,
+			String administrationCode, String domainCode, int start, int end) {
+
+		// String[] names = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			// names = CustomSQLUtil.keywords(keywords);
+		} else {
+			andOperator = true;
+		}
+
+		return _searchServiceActive(groupId, keywords, administrationCode,
+				domainCode, andOperator, start, end);
+	}
+
+	/**
+	 * @param groupId
+	 * @param keywords
+	 * @param adminCode
+	 * @param domainCode
+	 * @param andOperator
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	private List<ServiceInfo> _searchServiceActive(long groupId,
+			String keyword, String adminCode, String domainCode,
+			boolean andOperator, int start, int end) {
+
+		// keywords = CustomSQLUtil.keywords(keywords);
+
+		Session session = null;
+		try {
+			session = openSession();
+
+			String sql = CustomSQLUtil.get(SEARCH_SERVICE_ACTIVE_SQL);
+
+			if (Validator.isNull(keyword)) {
+				sql = StringUtil
+						.replace(
+								sql,
+								"AND ((lower(opencps_serviceinfo.serviceName) LIKE ?) OR (lower(opencps_serviceinfo.fullName) LIKE ?))",
+								StringPool.BLANK);
+			}
+
+			// remove condition query
+			if (Validator.equals(adminCode, "0")
+					|| Validator.equals(adminCode, StringPool.BLANK)) {
+				sql = StringUtil.replace(sql,
+						"AND (opencps_serviceinfo.administrationCode = ?)",
+						StringPool.BLANK);
+			}
+
+			if (Validator.equals(domainCode, "0")
+					|| Validator.equals(domainCode, StringPool.BLANK)) {
+				sql = StringUtil
+						.replace(
+								sql,
+								"AND ((opencps_serviceinfo.domainCode = ?) OR (opencps_serviceinfo.domainIndex like ?))",
+								StringPool.BLANK);
+			}
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.setCacheable(false);
+
+			q.addEntity("ServiceInfo", ServiceInfoImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+
+			if (Validator.isNotNull(keyword)) {
+				qPos.add("%" + keyword + "%");
+
+				qPos.add("%" + keyword + "%");
+			}
+
+			if (!Validator.equals(adminCode, "0")
+					&& !Validator.equals(adminCode, StringPool.BLANK)) {
+				qPos.add(adminCode);
+			}
+
+			if (!Validator.equals(domainCode, "0")
+					&& !Validator.equals(domainCode, StringPool.BLANK)) {
+				qPos.add(domainCode);
+				qPos.add(StringPool.PERCENT + domainCode + StringPool.PERIOD
+						+ StringPool.PERCENT);
+			}
+
+			return (List<ServiceInfo>) QueryUtil.list(q, getDialect(), start,
+					end);
+		} catch (Exception e) {
+			try {
+				throw new SystemException(e);
+			} catch (SystemException se) {
+				se.printStackTrace();
+			}
+		} finally {
+			closeSession(session);
+		}
+
+		return null;
+
+	}
+
+	/**
+	 * @param groupId
+	 * @param keywords
+	 * @param administrationCode
+	 * @param domainCode
+	 * @return
+	 */
+	public int countServiceActive(long groupId, String keywords,
+			String administrationCode, String domainCode) {
+
+		// String[] names = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			// names = CustomSQLUtil.keywords(keywords);
+		} else {
+			andOperator = true;
+		}
+
+		return _countServiceActive(groupId, keywords, administrationCode,
+				domainCode, andOperator);
+	}
+
+	/**
+	 * @param groupId
+	 * @param keywords
+	 * @param adminCode
+	 * @param domainCode
+	 * @param andOperator
+	 * @return
+	 */
+	private int _countServiceActive(long groupId, String keyword,
+			String adminCode, String domainCode, boolean andOperator) {
+
+		// keywords = CustomSQLUtil.keywords(keywords);
+
+		Session session = null;
+		try {
+			session = openSession();
+
+			String sql = CustomSQLUtil.get(COUNT_SERVICE_ACTIVE_SQL);
+
+			if (Validator.isNull(keyword)) {
+				sql = StringUtil
+						.replace(
+								sql,
+								"AND ((lower(opencps_serviceinfo.serviceName) LIKE ?) OR (lower(opencps_serviceinfo.fullName) LIKE ?))",
+								StringPool.BLANK);
+			}
+
+			// remove condition query
+			if (Validator.equals(adminCode, "0")
+					|| Validator.equals(adminCode, StringPool.BLANK)) {
+				sql = StringUtil.replace(sql,
+						"AND (opencps_serviceinfo.administrationCode = ?)",
+						StringPool.BLANK);
+			}
+
+			if (Validator.equals(domainCode, "0")
+					|| Validator.equals(domainCode, StringPool.BLANK)) {
+				sql = StringUtil
+						.replace(
+								sql,
+								"AND ((opencps_serviceinfo.domainCode = ?) OR (opencps_serviceinfo.domainIndex like ?))",
+								StringPool.BLANK);
+			}
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.setCacheable(false);
+
+			q.addScalar(COUNT_COLUMN_NAME, Type.INTEGER);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+
+			if (Validator.isNotNull(keyword)) {
+				qPos.add("%" + keyword + "%");
+
+				qPos.add("%" + keyword + "%");
+			}
+
+			if (!Validator.equals(adminCode, "0")
+					&& !Validator.equals(adminCode, StringPool.BLANK)) {
+				qPos.add(adminCode);
+			}
+
+			if (!Validator.equals(domainCode, "0")
+					&& !Validator.equals(domainCode, StringPool.BLANK)) {
+				qPos.add(domainCode);
+				qPos.add(StringPool.PERCENT + domainCode + StringPool.PERIOD
+						+ StringPool.PERCENT);
+			}
+
+			Iterator<Integer> itr = q.iterate();
+
+			if (itr.hasNext()) {
+				Integer count = itr.next();
+
+				if (count != null) {
+					return count.intValue();
+				}
+			}
+
+			return 0;
+
+		} catch (Exception e) {
+			try {
+				throw new SystemException(e);
+			} catch (SystemException se) {
+				se.printStackTrace();
+			}
+		} finally {
 			closeSession(session);
 		}
 

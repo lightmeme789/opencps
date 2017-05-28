@@ -221,9 +221,9 @@
 			<portlet:param name="redirectURL" value="<%=currentURL%>" />
 		</portlet:actionURL>
 
-		<liferay-ui:icon cssClass="search-container-action fa forward"
-			image="reply" message="cancel-dossier"
-			url="<%=cancelDossierURL.toString()%>" />
+<%-- 		<liferay-ui:icon cssClass="search-container-action fa forward" --%>
+<%-- 			image="reply" message="cancel-dossier" --%>
+<%-- 			url="<%=cancelDossierURL.toString()%>" /> --%>
 
 	</c:when>
 	

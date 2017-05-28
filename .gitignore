@@ -332,3 +332,7 @@ portlets/opencps-portlet/docroot/WEB-INF/src/org/opencps/postal/model/impl/*
 portlets/opencps-portlet/docroot/WEB-INF/src/org/opencps/postal/service/base/*
 portlets/opencps-portlet/docroot/WEB-INF/src/org/opencps/postal/service/persistence/*
 portlets/opencps-portlet/docroot/WEB-INF/src/META-INF/portlet-model-hints.xml
+
+*.tern-project
+*.classpath
+*.settings

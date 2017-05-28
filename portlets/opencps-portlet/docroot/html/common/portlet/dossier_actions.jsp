@@ -107,7 +107,6 @@
 		
 	}
 	
-	System.out.println("signCheck  " + signCheck);
 	
 	if(dossierId > 0 && dossierPartId > 0){
 		try{

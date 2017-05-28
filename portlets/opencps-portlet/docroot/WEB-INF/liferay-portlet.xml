@@ -93,6 +93,9 @@
 		<configuration-action-class>org.opencps.servicemgt.portlet.ConfigurationDisrectoryImpl</configuration-action-class>
 		<header-portlet-css>/css/servicemgt.css</header-portlet-css>
 		<footer-portlet-javascript>
+			/js/opencps-combo-tree.js
+		</footer-portlet-javascript>
+		<footer-portlet-javascript>
 			/js/main.js
 		</footer-portlet-javascript>
 		<css-class-wrapper>10-opencps-servicemgt-portlet</css-class-wrapper>

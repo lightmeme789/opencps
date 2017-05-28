@@ -40,22 +40,30 @@
 			filter.setParameter(ServiceDisplayTerms.SERVICE_ADMINISTRATION,
 				Long.toString(di.getDictItemId()));
 			String css = "odd";
-			if(ls.indexOf(di) % 2 == 0){
-				css = "even";
-			}
+			
+			
+			int count = 0;
+			count = ServiceInfoLocalServiceUtil.countServiceInAdmin(scopeGroupId,
+					Long.toString(di.getDictItemId()), 1);
+			
+			if(count >0){
+				
+				if(ls.indexOf(di) % 2 == 0){
+					css = "even";
+				}
 		%>
 		<li class="<%=css%>">
 				<i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
 				<a href="<%= filter.toString() %>">
 					<%= di.getItemName(locale) %> 
 					<span > <!-- class="badge" -->
-						(<%= ServiceInfoLocalServiceUtil.countServiceInAdmin(scopeGroupId,
-							Long.toString(di.getDictItemId()), 1) %>)
+						(<%=count  %>)
 					</span>	
 				</a>
 			</li>
 		<%
 			}
+		}
 		%>
 	</ul>
 </div>

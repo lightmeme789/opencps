@@ -39,6 +39,12 @@
 				filter.setParameter(ServiceDisplayTerms.SERVICE_DOMAINCODE,
 					Long.toString(di.getDictItemId()));
 				String css = "odd";
+				
+				int count = 0;
+				count = ServiceInfoLocalServiceUtil.countServiceInDomain(scopeGroupId,
+						Long.toString(di.getDictItemId()), 1);
+				
+			if(count>0){
 				if(ls.indexOf(di) % 2 == 0){
 					css = "even";
 				}
@@ -47,14 +53,12 @@
 				<i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
 				<a href="<%= filter.toString() %>">
 					<%= di.getItemName(locale) %> 
-					<span > <!-- class="badge" -->
-							(<%= ServiceInfoLocalServiceUtil.countServiceInDomain(scopeGroupId,
-							Long.toString(di.getDictItemId()), 1) %>)
-					</span>	
+					<span >(<%= count %>)</span>	
 				</a>
 			</li>
 		<%
 			}
+		}
 		%>
 	</ul>
 </div>

@@ -1,4 +1,6 @@
 
+<%@page import="java.util.Date"%>
+<%@page import="com.liferay.portal.kernel.util.TimeZoneUtil"%>
 <%@page import="javax.portlet.PortletRequest"%>
 <%@page import="com.liferay.portal.kernel.portlet.LiferayPortletMode"%>
 <%@page import="com.liferay.portlet.PortletURLFactoryUtil"%>
@@ -163,10 +165,10 @@ $(document).ready(function(){
 			<%
 				ServiceSearchTerms searchTerms = (ServiceSearchTerms) searchContainer.getSearchTerms();
 	
-				total = ServiceInfoLocalServiceUtil.countService(scopeGroupId, searchTerms.getKeywords(), 
+				total = ServiceInfoLocalServiceUtil.countServiceActive(scopeGroupId, searchTerms.getKeywords(), 
 					searchTerms.getAdministrationCode(), searchTerms.getDomainCode());
 	
-				results = ServiceInfoLocalServiceUtil.searchService(scopeGroupId, searchTerms.getKeywords(), 
+				results = ServiceInfoLocalServiceUtil.searchServiceActive(scopeGroupId, searchTerms.getKeywords(), 
 					searchTerms.getAdministrationCode(), searchTerms.getDomainCode(),
 					searchContainer.getStart(), searchContainer.getEnd());
 				

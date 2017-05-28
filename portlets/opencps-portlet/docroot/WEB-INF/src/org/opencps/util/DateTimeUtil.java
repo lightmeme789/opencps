@@ -19,6 +19,7 @@ package org.opencps.util;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -40,8 +41,8 @@ public class DateTimeUtil {
 
 	public static String convertDateToString(Date date, String pattern) {
 
-		DateFormat dateFormat =
-			DateFormatFactoryUtil.getSimpleDateFormat(pattern);
+		DateFormat dateFormat = DateFormatFactoryUtil
+				.getSimpleDateFormat(pattern);
 		if (date == null || Validator.isNull(pattern)) {
 			return StringPool.BLANK;
 		}
@@ -53,10 +54,22 @@ public class DateTimeUtil {
 		return dateFormat.format(calendar.getTime());
 	}
 
+	public static String convertDateToStringOne(Date date, String pattern) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+		if (date == null || Validator.isNull(pattern)) {
+			return StringPool.BLANK;
+		}
+
+		String dateFormat = sdf.format(date);
+
+		return dateFormat;
+	}
+
 	public static DateFormat getDateTimeFormat(String pattern) {
 
-		DateFormat dateFormat =
-			DateFormatFactoryUtil.getSimpleDateFormat(pattern);
+		DateFormat dateFormat = DateFormatFactoryUtil
+				.getSimpleDateFormat(pattern);
 		if (Validator.isNotNull(pattern)) {
 			pattern = _VN_DATE_TIME_FORMAT;
 		}
@@ -121,15 +134,14 @@ public class DateTimeUtil {
 				date = df.parse(strDate);
 			}
 
-		}
-		catch (ParseException e) {
+		} catch (ParseException e) {
 			_log.error(e);
 		}
 		return date;
 	}
-	
+
 	public static Date convertStringToFullDate(String strDate) {
-		
+
 		DateFormat df = getDateTimeFormat(_VN_DATE_TIME_FORMAT);
 		Date date = null;
 		try {
@@ -137,8 +149,7 @@ public class DateTimeUtil {
 				date = df.parse(strDate);
 			}
 
-		}
-		catch (ParseException e) {
+		} catch (ParseException e) {
 			_log.error(e);
 		}
 		return date;
@@ -152,34 +163,34 @@ public class DateTimeUtil {
 		calendar.set(Calendar.YEAR, year);
 		return calendar.getTime();
 	}
-	
+
 	public static Date getDateBeginOfDay(int day, int month, int year) {
 
 		Calendar calendar = Calendar.getInstance();
-		
+
 		calendar.set(Calendar.DAY_OF_MONTH, day);
 		calendar.set(Calendar.MONTH, month);
 		calendar.set(Calendar.YEAR, year);
-		
+
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
-		
+
 		return calendar.getTime();
 	}
-	
+
 	public static Date getDateEndOfDay(int day, int month, int year) {
 
 		Calendar calendar = Calendar.getInstance();
-		
+
 		calendar.set(Calendar.DAY_OF_MONTH, day);
 		calendar.set(Calendar.MONTH, month);
 		calendar.set(Calendar.YEAR, year);
-		
+
 		calendar.set(Calendar.HOUR_OF_DAY, 23);
 		calendar.set(Calendar.MINUTE, 59);
 		calendar.set(Calendar.SECOND, 59);
-		
+
 		return calendar.getTime();
 	}
 
@@ -198,16 +209,14 @@ public class DateTimeUtil {
 		if (month < 10) {
 			sb.append(0);
 			sb.append(month);
-		}
-		else {
+		} else {
 			sb.append(month);
 		}
 
 		if (day < 10) {
 			sb.append(0);
 			sb.append(day);
-		}
-		else {
+		} else {
 			sb.append(day);
 		}
 
@@ -224,7 +233,7 @@ public class DateTimeUtil {
 		}
 		return calendar;
 	}
-	
+
 	public static int convertTimemilisecondsToDays(long time) {
 
 		int days = 0;
@@ -263,7 +272,8 @@ public class DateTimeUtil {
 	public static String convertTimemilisecondsToFormat(long time, Locale locale) {
 
 		String format = new String(DATE_TIME_FORMAT);
-		String day = LanguageUtil.get(locale, DAY_PROPERTIES).toLowerCase();;
+		String day = LanguageUtil.get(locale, DAY_PROPERTIES).toLowerCase();
+		;
 
 		long diffMinutes = 0;
 		long diffHours = 0;
@@ -274,17 +284,17 @@ public class DateTimeUtil {
 		diffDays = time / (24 * 60 * 60 * 1000);
 
 		if (diffDays != 0) {
-			
+
 			format = format.replace(DAY, String.valueOf(Math.abs(diffDays)));
 			format = format.replace(DAY_LANG, day);
-			
+
 		} else {
-			
+
 			format = format.replace(DAY, StringPool.BLANK);
 			format = format.replace(DAY_LANG, StringPool.BLANK);
-			
+
 		}
-		
+
 		if (diffHours == 0 && diffMinutes == 0) {
 			format = format.replace(SUB_DATE_TIME_FORMAT, StringPool.BLANK);
 		} else {
@@ -298,31 +308,31 @@ public class DateTimeUtil {
 					+ format.trim();
 		} else if (time < 0) {
 			format = LanguageUtil.get(locale, LATE) + StringPool.SPACE
-					
-					+ format.trim();
+
+			+ format.trim();
 		} else {
 			format = LanguageUtil.get(locale, ONTIME) + format.trim();
 		}
 
 		return format;
 	}
-	
+
 	public DateTimeBean getDateTimeFromPattern(String pattern) {
-		
+
 		DateTimeBean dateTimeBean = new DateTimeBean();
 
 		int Days = 0;
 		int Hours = 0;
 		int Minutes = 0;
-		
+
 		/* Pattern Format Example : "3 10:30" */
-		
+
 		if (pattern.trim().length() > 0) {
 
 			String[] splitPattern = StringUtil.split(pattern, StringPool.SPACE);
 
 			if (splitPattern.length == 1) {
-				
+
 				Days = GetterUtil.getInteger(splitPattern[0], 0);
 
 			} else if (splitPattern.length == 2) {
@@ -344,12 +354,11 @@ public class DateTimeUtil {
 		dateTimeBean.setDays(Days);
 		dateTimeBean.setHours(Hours);
 		dateTimeBean.setMinutes(Minutes);
-		
-		
+
 		return dateTimeBean;
 
 	}
-	
+
 	public class DateTimeBean {
 
 		public DateTimeBean() {
@@ -387,35 +396,35 @@ public class DateTimeUtil {
 			Minutes = minutes2;
 		}
 	}
-	
+
 	private static final String DAY = "{d}";
-	
+
 	private static final String DAY_LANG = "{D}";
-	
+
 	private static final String DAY_PROPERTIES = "day";
-	
+
 	private static final String HOUR = "{HH}";
-	
+
 	private static final String MINUTE = "{MM}";
-	
+
 	private static final String EARLY = "status-soon";
-	
+
 	private static final String LATE = "status-late";
-	
+
 	private static final String ONTIME = "status-ontime";
-	
+
 	private static final String DATE_TIME_FORMAT = "{d} {D} {HH}:{MM}";
-	
+
 	private static final String SUB_DATE_TIME_FORMAT = "{HH}:{MM}";
 
-	public static final String _TIMESTAMP = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+	public static final String _TIMESTAMP = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'";
 
 	public static final String _VN_DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
 
 	public static final String _VN_DATE_FORMAT = "dd/MM/yyyy";
 
 	public static final String _EMPTY_DATE_TIME = "__/__/__";
-	
+
 	public static final String _DATE_TIME_TO_NAME = "yyyyMMdd";
 
 	private static Log _log = LogFactoryUtil.getLog(DateTimeUtil.class);
