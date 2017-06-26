@@ -45,21 +45,27 @@
 <%@ include file="../init.jsp"%>
 
 <div class="featured">
-    <div class="title-featured col-xs-12 col-sm-12 col-lg-12 span12" style="">
-        <div class="color-ogange"><span><liferay-ui:message key="beautiful-life"/></span></div>
-        <div class="color-white">
-            <span><liferay-ui:message key="slogan-key"/></span>
-        </div>
+    <div class="login-register title-featured col-xs-12 col-sm-12 col-lg-12 span12">
+        <div class="btn-primary-inner col-xs-6 col-sm-6 col-lg-6 text-right span6">
+			<div class="sct-btn color-default">
+				<a href="/login" title="<liferay-ui:message key="login-key"/>"><liferay-ui:message key="login-key"/></a>
+			</div>
+		</div>
+		<div class="btn-register-inner span6 text-left" style="margin-left: 1.5%;">
+			<div class="sct-btn color-register">
+				<a href="/register" title="<liferay-ui:message key="register-key"/>"><liferay-ui:message key="register-key"/></a>
+			</div>
+		</div>
     </div>
-    <div class="login-register col-xs-12 col-sm-12 col-lg-12 span12">
+    <%-- <div class="login-register col-xs-12 col-sm-12 col-lg-12 span12">
         <div class="sct-btn button-primary">
             <a href="/login" title="<liferay-ui:message key="login-key"/>"><i class="btn-login"></i><liferay-ui:message key="login-key"/></a>
         </div>
         <div class="sct-btn btn-register">
             <a href="/register" title="register-key"><i class="btn-ico-register"></i><liferay-ui:message key="register-key"/></a>
         </div>
-    </div>
-    <div class="search col-xs-12 col-sm-6 col-lg-6 span6">
+    </div> --%>
+<%--     <div class="search col-xs-12 col-sm-6 col-lg-6 span6">
         <div class="search-inner">
             <div class="input-group">
                 <div class = "home-search">
@@ -67,11 +73,22 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --%>
    <%--  <div class = "home-search">
     	<liferay-util:include page="/html/portlets/dossiermgt/monitoring/toolbar.jsp" servletContext="<%=application %>" />
     </div> --%>
-
+    <div class="search col-xs-12 col-sm-12 col-lg-12 span12">
+        <div class="search-inner">
+            <div class="input-group">
+                <input type="text" class="form-control" name="x" placeholder="<liferay-ui:message key="dossier-search-keywords-home"/>">
+                <span class="input-group-btn">
+                    <button class="sct-btn btn-common" type="button"><span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 <%
 	Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);
 	PortletURL iteratorURL = renderResponse.createRenderURL();
@@ -171,7 +188,8 @@
 	</aui:row>
 
 </c:if>
-</div>
+
+
 <%!
 	private Log _log = LogFactoryUtil.getLog("html.portlets.dossiermgt.monitoring.search.jsp");
 %>
